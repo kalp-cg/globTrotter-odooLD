@@ -25,7 +25,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      // If we use bearer tokens: localStorage.setItem("accessToken", data.token);
+      if (data.token) localStorage.setItem("accessToken", data.token);
       queryClient.setQueryData(["auth", "me"], data.user);
       router.push("/");
     },
@@ -39,6 +39,7 @@ export function useSignup() {
   return useMutation({
     mutationFn: signup,
     onSuccess: (data) => {
+      if (data.token) localStorage.setItem("accessToken", data.token);
       queryClient.setQueryData(["auth", "me"], data.user);
       router.push("/");
     },
@@ -52,7 +53,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
-      // localStorage.removeItem("accessToken");
+      localStorage.removeItem("accessToken");
       queryClient.setQueryData(["auth", "me"], null);
       queryClient.clear(); // Clear all cached data
       router.push("/login");

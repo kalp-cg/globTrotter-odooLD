@@ -15,15 +15,13 @@ export async function apiClient<T>(
   // Attach credentials (httpOnly cookies) by default for cross-origin requests
   const config: RequestInit = {
     ...options,
-    credentials: "true" === process.env.NEXT_PUBLIC_USE_BEARER ? "omit" : "include",
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
     },
   };
 
-  // If using bearer tokens instead of cookies (swap this logic if needed)
-  if (typeof window !== "undefined" && "true" === process.env.NEXT_PUBLIC_USE_BEARER) {
+  if (typeof window !== "undefined") {
     const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers = {
@@ -66,5 +64,9 @@ export async function apiClient<T>(
     return {} as T;
   }
 
-  return response.json();
+  const json = await response.json();
+  if (json && typeof json === 'object' && 'success' in json && 'data' in json) {
+    return json.data as T;
+  }
+  return json as T;
 }
