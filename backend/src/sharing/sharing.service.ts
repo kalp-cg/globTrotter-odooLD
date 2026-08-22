@@ -36,7 +36,7 @@ export class SharingService {
         u.name AS creator_name, u.photo_url AS creator_photo
       FROM trips t
       JOIN users u ON t.user_id = u.id
-      WHERE t.public_slug = $1 AND t.is_public = true
+      WHERE (t.public_slug = $1 OR t.id::text = $1) AND t.is_public = true
       LIMIT 1;
     `, [slug]);
 
@@ -89,7 +89,7 @@ export class SharingService {
 
   static async copySharedTrip(slug: string, userId: string) {
     const tripRes = await query(`
-      SELECT * FROM trips WHERE public_slug = $1 AND is_public = true LIMIT 1
+      SELECT * FROM trips WHERE (public_slug = $1 OR id::text = $1) AND is_public = true LIMIT 1
     `, [slug]);
 
     if (tripRes.rows.length === 0) throw new AppError('Shared trip not found', 404);
@@ -134,8 +134,10 @@ export class SharingService {
     await BudgetService.recalculateTripBudget(newTripId);
 
     return {
+      id: newTripId,
       trip_id: newTripId,
-      name: `${sourceTrip.name} (Copy)`
+      name: `${sourceTrip.name} (Copy)`,
+      public_slug: newSlug
     };
   }
 }

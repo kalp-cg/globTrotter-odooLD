@@ -42,29 +42,65 @@ export class ItineraryService {
   }
 
   static async addStop(tripId: string, userId: string, isAdmin: boolean, body: any) {
-    const { city_id, title, notes, arrival_date, departure_date, section_budget, order_index } = body;
-
-    if (!city_id || !arrival_date || !departure_date) {
-      throw new AppError('City, arrival date, and departure date are required', 400);
-    }
-
-    const tripCheck = await query(`SELECT user_id FROM trips WHERE id = $1`, [tripId]);
+    const tripCheck = await query(`SELECT user_id, start_date, end_date FROM trips WHERE id = $1`, [tripId]);
     if (tripCheck.rows.length === 0) throw new AppError('Trip not found', 404);
     if (tripCheck.rows[0].user_id !== userId && !isAdmin) throw new AppError('Forbidden: Not trip owner', 403);
+    const trip = tripCheck.rows[0];
 
-    let finalOrder = order_index;
+    const city_id = body.city_id || body.cityId || body.city?.id;
+    if (!city_id) {
+      throw new AppError('City is required to add a stop', 400);
+    }
+
+    let resolvedCityId = city_id;
+    if (typeof city_id === 'string' && city_id.startsWith('external_')) {
+      const ensured = await query(`SELECT id FROM cities WHERE external_id = $1 OR id::text = $1 LIMIT 1`, [city_id]);
+      if (ensured.rows.length > 0) {
+        resolvedCityId = ensured.rows[0].id;
+      } else {
+        const newCityId = uuidv4();
+        await query(`
+          INSERT INTO cities (id, external_id, name, country, region, cost_index, popularity_score, image_url, description)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `, [
+          newCityId,
+          city_id,
+          body.title || body.cityName || body.city_name || 'Destination City',
+          body.cityCountry || body.city_country || 'Global',
+          body.cityRegion || body.city_region || 'Global',
+          2.0,
+          5.0,
+          body.cityImageUrl || body.city_image_url || null,
+          body.cityDescription || null
+        ]);
+        resolvedCityId = newCityId;
+      }
+    }
+
+    let arrival_date = body.arrival_date || body.arrivalDate;
+    let departure_date = body.departure_date || body.departureDate;
+
+    if (!arrival_date) {
+      arrival_date = trip.start_date ? new Date(trip.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    }
+    if (!departure_date) {
+      departure_date = trip.end_date ? new Date(trip.end_date).toISOString().split('T')[0] : arrival_date;
+    }
+
+    let finalOrder = body.order_index ?? body.orderIndex;
     if (finalOrder === undefined || finalOrder === null) {
       const maxRes = await query(`SELECT COALESCE(MAX(order_index), 0) + 1 AS next_order FROM stops WHERE trip_id = $1`, [tripId]);
       finalOrder = maxRes.rows[0]?.next_order || 1;
     }
 
     const stopId = uuidv4();
-    const finalTitle = title || `Section ${finalOrder}`;
+    const finalTitle = body.title || body.cityName || body.city_name || `Section ${finalOrder}`;
+    const finalBudget = body.section_budget ?? body.sectionBudget ?? 0.00;
 
     await query(`
       INSERT INTO stops (id, trip_id, city_id, title, notes, arrival_date, departure_date, section_budget, order_index)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    `, [stopId, tripId, city_id, finalTitle, notes || null, arrival_date, departure_date, section_budget || 0.00, finalOrder]);
+    `, [stopId, tripId, resolvedCityId, finalTitle, body.notes || null, arrival_date, departure_date, finalBudget, finalOrder]);
 
     await BudgetService.recalculateTripBudget(tripId);
 
@@ -88,7 +124,13 @@ export class ItineraryService {
     if (tripCheck.rows.length === 0) throw new AppError('Trip not found', 404);
     if (tripCheck.rows[0].user_id !== userId && !isAdmin) throw new AppError('Forbidden: Not trip owner', 403);
 
-    const { city_id, title, notes, arrival_date, departure_date, section_budget, order_index } = body;
+    const city_id = body.city_id || body.cityId;
+    const title = body.title;
+    const notes = body.notes;
+    const arrival_date = body.arrival_date || body.arrivalDate;
+    const departure_date = body.departure_date || body.departureDate;
+    const section_budget = body.section_budget !== undefined ? body.section_budget : body.sectionBudget;
+    const order_index = body.order_index !== undefined ? body.order_index : body.orderIndex;
 
     const res = await query(`
       UPDATE stops
@@ -121,12 +163,15 @@ export class ItineraryService {
   }
 
   static async attachActivity(tripId: string, stopId: string, userId: string, isAdmin: boolean, body: any) {
-    const { activity_id, scheduled_date, scheduled_time, actual_cost } = body;
+    let activity_id = body.activity_id || body.activityId;
+    const scheduled_date = body.scheduled_date || body.scheduledDate;
+    const scheduled_time = body.scheduled_time || body.scheduledTime;
+    const actual_cost = body.actual_cost !== undefined ? body.actual_cost : body.actualCost;
 
     if (!activity_id) throw new AppError('Activity ID is required', 400);
 
     const stopCheck = await query(`
-      SELECT s.id, s.arrival_date, s.departure_date, t.user_id 
+      SELECT s.id, s.city_id, s.arrival_date, s.departure_date, t.user_id 
       FROM stops s 
       JOIN trips t ON s.trip_id = t.id 
       WHERE s.id = $1 AND t.id = $2
@@ -136,6 +181,32 @@ export class ItineraryService {
     if (stopCheck.rows[0].user_id !== userId && !isAdmin) throw new AppError('Forbidden: Not trip owner', 403);
 
     const stop = stopCheck.rows[0];
+
+    // If external activity, automatically ensure it exists in DB
+    if (typeof activity_id === 'string' && activity_id.startsWith('external_')) {
+      const actName = body.activity_name || body.name || 'Activity';
+      const existing = await query(`SELECT id FROM activities WHERE id::text = $1 OR (city_id = $2 AND name = $3) LIMIT 1`, [activity_id, stop.city_id, actName]);
+      if (existing.rows.length > 0) {
+        activity_id = existing.rows[0].id;
+      } else {
+        const newActId = uuidv4();
+        await query(`
+          INSERT INTO activities (id, city_id, name, category, description, image_url, est_cost, est_duration_mins)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [
+          newActId,
+          stop.city_id,
+          actName,
+          body.category || 'Sightseeing',
+          body.description || null,
+          body.image_url || body.imageUrl || null,
+          actual_cost || 0,
+          body.est_duration_mins || body.estDurationMins || 60
+        ]);
+        activity_id = newActId;
+      }
+    }
+
     const targetDate = scheduled_date || stop.arrival_date;
 
     const actRes = await query(`SELECT * FROM activities WHERE id = $1`, [activity_id]);
@@ -185,20 +256,19 @@ export class ItineraryService {
     return true;
   }
 
-  static async reorderStops(tripId: string, userId: string, isAdmin: boolean, stops: { id: string; order_index: number }[]) {
+  static async reorderStops(tripId: string, userId: string, isAdmin: boolean, stops: { id: string; order_index?: number; orderIndex?: number }[]) {
     const tripCheck = await query(`SELECT user_id FROM trips WHERE id = $1`, [tripId]);
     if (tripCheck.rows.length === 0) throw new AppError('Trip not found', 404);
     if (tripCheck.rows[0].user_id !== userId && !isAdmin) throw new AppError('Forbidden: Not trip owner', 403);
 
-    // Run within a transaction-like loop for simplicity in this demo, though an actual transaction is better
-    // Neon PG pool query auto-commits, so we'll just update sequentially.
     for (const stop of stops) {
-      if (!stop.id || stop.order_index === undefined) continue;
+      const order = stop.order_index !== undefined ? stop.order_index : stop.orderIndex;
+      if (!stop.id || order === undefined) continue;
       await query(`
         UPDATE stops 
         SET order_index = $1 
         WHERE id = $2 AND trip_id = $3
-      `, [stop.order_index, stop.id, tripId]);
+      `, [order, stop.id, tripId]);
     }
 
     return true;

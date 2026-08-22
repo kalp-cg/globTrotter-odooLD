@@ -70,7 +70,11 @@ export class TripsService {
   }
 
   static async createTrip(userId: string, body: any) {
-    const { name, description, cover_photo_url, is_public, initial_city_id } = body;
+    const name = body.name;
+    const description = body.description;
+    const cover_photo_url = body.cover_photo_url || body.coverPhotoUrl;
+    const is_public = body.is_public !== undefined ? body.is_public : (body.isPublic !== undefined ? body.isPublic : false);
+    const initial_city_id = body.initial_city_id || body.initialCityId;
     const start_date = body.start_date || body.startDate;
     const end_date = body.end_date || body.endDate;
 
@@ -165,7 +169,12 @@ export class TripsService {
     if (checkRes.rows.length === 0) throw new AppError('Trip not found', 404);
     if (checkRes.rows[0].user_id !== userId && !isAdmin) throw new AppError('Forbidden: Not trip owner', 403);
 
-    const { name, description, cover_photo_url, start_date, end_date, is_public } = body;
+    const name = body.name;
+    const description = body.description;
+    const cover_photo_url = body.cover_photo_url || body.coverPhotoUrl;
+    const start_date = body.start_date || body.startDate;
+    const end_date = body.end_date || body.endDate;
+    const is_public = body.is_public !== undefined ? body.is_public : body.isPublic;
 
     const res = await query(`
       UPDATE trips

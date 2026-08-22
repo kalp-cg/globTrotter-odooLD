@@ -84,12 +84,13 @@ export class CitiesService {
   }
 
   static async ensureCity(cityData: any) {
-    if (!cityData.external_id) {
-      throw new AppError('Missing external_id', 400);
+    const extId = cityData.external_id || cityData.id || cityData.externalId;
+    if (!extId) {
+      throw new AppError('Missing external_id or id', 400);
     }
 
-    // Check if it already exists by external_id
-    const existing = await query(`SELECT id FROM cities WHERE external_id = $1 LIMIT 1`, [cityData.external_id]);
+    // Check if it already exists by external_id or id
+    const existing = await query(`SELECT id FROM cities WHERE external_id = $1 OR id::text = $1 LIMIT 1`, [extId]);
     if (existing.rows.length > 0) {
       return { id: existing.rows[0].id };
     }
@@ -102,14 +103,14 @@ export class CitiesService {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `, [
       newId,
-      cityData.external_id,
-      cityData.name,
-      cityData.country || 'Unknown',
-      cityData.region || 'Global',
-      cityData.cost_index || 2.0,
-      cityData.popularity_score || 5.0,
-      cityData.image_url,
-      cityData.description
+      extId,
+      cityData.name || 'Unknown City',
+      cityData.country || cityData.cityCountry || 'Unknown',
+      cityData.region || cityData.cityRegion || 'Global',
+      cityData.cost_index || cityData.costIndex || 2.0,
+      cityData.popularity_score || cityData.popularityScore || 5.0,
+      cityData.image_url || cityData.imageUrl || null,
+      cityData.description || null
     ]);
 
     return { id: newId };
