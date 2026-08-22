@@ -70,7 +70,9 @@ export class TripsService {
   }
 
   static async createTrip(userId: string, body: any) {
-    const { name, description, cover_photo_url, start_date, end_date, is_public, initial_city_id } = body;
+    const { name, description, cover_photo_url, is_public, initial_city_id } = body;
+    const start_date = body.start_date || body.startDate;
+    const end_date = body.end_date || body.endDate;
 
     if (!name || !start_date || !end_date) {
       throw new AppError('Trip name, start date, and end date are required', 400);
