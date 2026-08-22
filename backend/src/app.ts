@@ -46,7 +46,17 @@ if (env.NODE_ENV !== 'test') {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 2. Health check route
+// 2. Root & Health check routes
+app.all('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'GlobeTrotter Backend API',
+    message: 'Welcome to GlobeTrotter REST API service. Use /api routes to interact.',
+    health: '/api/health',
+    version: '1.1.0'
+  });
+});
+
 app.get('/api/health', async (req, res) => {
   try {
     const result = await query('SELECT 1 as check, NOW() as timestamp;');

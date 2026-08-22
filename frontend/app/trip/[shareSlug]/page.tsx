@@ -6,7 +6,8 @@ export const revalidate = 60; // Cache for 60 seconds
 
 export async function generateMetadata({ params }: { params: Promise<{ shareSlug: string }> }) {
   const { shareSlug } = await params;
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://globtrotter-odoold-lgh6.onrender.com/api";
+  const apiUrl = rawUrl.endsWith("/api") ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
   
   try {
     const res = await fetch(`${apiUrl}/trips/public/${shareSlug}`, {
@@ -27,7 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<{ shareSlug
 
 export default async function PublicTripPage({ params }: { params: Promise<{ shareSlug: string }> }) {
   const { shareSlug } = await params;
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://globtrotter-odoold-lgh6.onrender.com/api";
+  const apiUrl = rawUrl.endsWith("/api") ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
   
   let tripData = null;
   let errorMsg = null;

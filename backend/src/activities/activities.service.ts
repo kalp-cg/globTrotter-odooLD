@@ -59,7 +59,7 @@ export class ActivitiesService {
           
           // Geocode city to get lat/lon
           const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&format=json`);
-          const geoData = await geoRes.json();
+          const geoData: any = await geoRes.json();
           if (geoData.results && geoData.results.length > 0) {
             const lat = geoData.results[0].latitude;
             const lon = geoData.results[0].longitude;
@@ -76,7 +76,7 @@ export class ActivitiesService {
               out 15;
             `;
             const overpassRes = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: overpassQuery });
-            const overpassData = await overpassRes.json();
+            const overpassData: any = await overpassRes.json();
 
             if (overpassData.elements) {
               const externalActivities = await Promise.all(overpassData.elements
@@ -91,7 +91,7 @@ export class ActivitiesService {
                       headers: { 'User-Agent': 'GlobeTrotterApp/1.0 (http://globetrotter.local; contact@globetrotter.local)' }
                     });
                     if (wikiRes.ok) {
-                      const wikiData = await wikiRes.json();
+                      const wikiData: any = await wikiRes.json();
                       if (wikiData.thumbnail?.source) imageUrl = wikiData.thumbnail.source;
                       else if (wikiData.originalimage?.source) imageUrl = wikiData.originalimage.source;
                     }

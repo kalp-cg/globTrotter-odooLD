@@ -1,6 +1,7 @@
 import { ApiError } from "./types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://globtrotter-odoold-lgh6.onrender.com/api";
+const BASE_URL = rawUrl.endsWith("/api") ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
 
 /**
  * Single typed API client for GlobeTrotter.

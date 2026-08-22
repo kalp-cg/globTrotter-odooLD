@@ -4,16 +4,54 @@
 > GlobeTrotter transforms complex multi-city expedition planning into an intuitive, tactile scrapbook experience. Sequence multi-stop itineraries, schedule activities, monitor live category budgets, and clone journeys shared by a global community of travelers.
 
 ---
-YT LINK :- https://youtu.be/yR3xj24J5z4?si=DLyqwxpltt2DytZ_
+
+<div align="center">
+
+[![Live Web App](https://img.shields.io/badge/🚀_Live_App-Vercel-black?style=for-the-badge&logo=vercel)](https://glob-trotter-odoo-ld.vercel.app/)
+[![Backend API](https://img.shields.io/badge/⚡_Backend_API-Render-46E3B7?style=for-the-badge&logo=render)](https://globtrotter-odoold-lgh6.onrender.com)
+[![Video Demo](https://img.shields.io/badge/📺_Video_Demo-YouTube-red?style=for-the-badge&logo=youtube)](https://youtu.be/yR3xj24J5z4?si=DLyqwxpltt2DytZ_)
+[![Database](https://img.shields.io/badge/🐘_PostgreSQL-Neon_Cloud-00E599?style=for-the-badge&logo=postgresql)](https://neon.tech)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+
+</div>
+
+---
+
+## ⚡ Quick Access & Live Deployments
+
+| Resource | URL | Status |
+| :--- | :--- | :--- |
+| 🌐 **Live Web Application (Vercel)** | [https://glob-trotter-odoo-ld.vercel.app/](https://glob-trotter-odoo-ld.vercel.app/) | 🟢 Active |
+| 🔌 **Production REST API (Render)** | [https://globtrotter-odoold-lgh6.onrender.com](https://globtrotter-odoold-lgh6.onrender.com) | 🟢 Active |
+| 🩺 **Backend Health Endpoint** | [https://globtrotter-odoold-lgh6.onrender.com/api/health](https://globtrotter-odoold-lgh6.onrender.com/api/health) | 🟢 200 OK |
+| 📺 **Video Walkthrough (YouTube)** | [https://youtu.be/yR3xj24J5z4](https://youtu.be/yR3xj24J5z4?si=DLyqwxpltt2DytZ_) | 🎬 High Definition |
+| 🖼️ **Visual Showcase Page** | [`showcase/index.html`](file:///home/kalppatel/Desktop/globTrotter-odooLD/showcase/index.html) | 📸 Screenshots & Specs |
+
+---
+
+## 🔑 Instant Demo Login Credentials
+
+You can test all platform features, including the **Admin HQ Analytics Panel**, using these pre-seeded accounts:
+
+| Role | Email | Password | Access Capabilities |
+| :--- | :--- | :--- | :--- |
+| 👑 **Administrator** | `kenji@globtrotter.com` | `123` | Full Admin HQ, User Role Management, Trip Moderation, System Analytics |
+| 🧳 **Explorer 1** | `alex@globtrotter.com` | `123` | Multi-City Itineraries, Budget Tracker, Day-by-Day Journal, Story Publishing |
+| 📸 **Explorer 2** | `sarah@globtrotter.com` | `123` | Itinerary Cloning, Currency Switching, Custom Packing Checklist |
+
+> 💡 *Note: You can also click **"Sign Up"** to create a fresh custom user account with instant JWT session issuance.*
+
+---
 
 ## 📑 Table of Contents
 - [✨ Key Features & Capabilities](#-key-features--capabilities)
+- [📸 Application Visual Gallery](#-application-visual-gallery)
 - [💻 Tech Stack](#-tech-stack)
 - [🏛️ System Architecture](#️-system-architecture)
 - [🗄️ Relational Database Model (ERD)](#️-relational-database-model-erd)
-- [🗺️ Application Route & Screen Directory](#️-application-route--screen-directory)
+- [🗺️ Route & Screen Directory](#️-route--screen-directory)
 - [🎨 Scrapbook Design Language & Tokens](#-scrapbook-design-language--tokens)
-- [🚀 Quick Start & Installation](#-quick-start--installation)
+- [🚀 Quick Start & Local Setup](#-quick-start--local-setup)
 - [🧪 Testing & Quality Assurance](#-testing--quality-assurance)
 - [📚 Sub-System Documentation](#-sub-system-documentation)
 
@@ -76,12 +114,25 @@ mindmap
 
 ---
 
+## 📸 Application Visual Gallery
+
+| 1. Expedition Hub & Itineraries | 2. Community Stories (Screen 10) |
+| :---: | :---: |
+| <img src="showcase/screenshots/landing_page.png" width="500" alt="Expedition Hub" /> | <img src="showcase/screenshots/community_stories.png" width="500" alt="Community Stories" /> |
+| **3. Day-by-Day Journal (Screen 9)** | **4. Authentication & Security Vault** |
+| <img src="showcase/screenshots/trip_details.png" width="500" alt="Day-by-Day Journal" /> | <img src="showcase/screenshots/auth_view.png" width="500" alt="Authentication" /> |
+
+---
+
 ## 💻 Tech Stack
 
-- **Frontend:** Next.js (App Router), React, TypeScript, Tailwind CSS, React Query
-- **Backend:** Node.js, Express, TypeScript
-- **Database:** NeonDB (PostgreSQL)
-- **Authentication:** JWT, bcryptjs
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, TanStack React Query, `@dnd-kit`, Recharts, Framer Motion |
+| **Backend** | Node.js, Express.js, TypeScript, PostgreSQL Client (`pg`), Rate-Limiter, Compression, Helmet, Morgan |
+| **Database** | PostgreSQL on Neon Cloud (Connection Pooling, SSL Encrypted) |
+| **Authentication** | JSON Web Tokens (JWT) + BCrypt Password Hashing + Refresh Tokens |
+| **Deployment** | **Vercel** (Frontend Edge CDN) + **Render** (Backend Web Service) |
 
 ---
 
@@ -224,27 +275,27 @@ erDiagram
 
 ---
 
-## 🗺️ Application Route & Screen Directory
+## 🗺️ Route & Screen Directory
 
 | Screen # | Feature Name | Route Path | Description | Access Level |
 |---|---|---|---|---|
-| **—** | **Public Arrival Landing** | `/` | Inspirational scrapbook landing page for new visitors | Public |
-| **#1** | **Login & Signup** | `/login`, `/signup` | Authentication card with tab switcher | Public |
-| **#2** | **Traveler HQ Dashboard** | `/` (Authenticated) | Personal trip carousel, 4-pillar guide, budget overview | User |
-| **#3** | **Create Trip** | `/trips/new` | Multi-day trip initialization form | User |
-| **#4** | **My Trips List** | `/trips` | Polaroid trip grid with status & delete | User |
+| **—** | **Public Arrival Landing** | [`/`](https://glob-trotter-odoo-ld.vercel.app/) | Inspirational scrapbook landing page for visitors | Public |
+| **#1** | **Login & Signup** | [`/login`](https://glob-trotter-odoo-ld.vercel.app/login) | Authentication card with instant tab switch | Public |
+| **#2** | **Traveler HQ Dashboard** | [`/`](https://glob-trotter-odoo-ld.vercel.app/) | Personal trip carousel, 4-pillar guide, budget bar | User |
+| **#3** | **Create Trip** | [`/trips/new`](https://glob-trotter-odoo-ld.vercel.app/trips/new) | Multi-day trip initialization form | User |
+| **#4** | **My Trips List** | [`/trips`](https://glob-trotter-odoo-ld.vercel.app/trips) | Polaroid trip grid with status & delete | User |
 | **#5** | **Itinerary Builder** | `/trips/[id]` | Sortable stops, city/activity slide-overs | User |
 | **#6 / #9** | **Day-by-Day Journal (Screen 9)** | `/trips/[id]/journal` | Sequence flow arrows, expense column, multi-currency | User |
-| **#7** | **City Search & Directory** | `/cities` | Filter by region, cost index, popularity score | Public / User |
-| **#8** | **Activity Search** | `/cities` / Slide-overs | Categorized experiences with costs and duration | Public / User |
-| **#9** | **Budget Analytics** | `/trips/[id]/budget` | Category pie chart, daily bar chart, budget alerts | User |
+| **#7** | **City Search & Directory** | [`/cities`](https://glob-trotter-odoo-ld.vercel.app/cities) | Filter by region, cost index, popularity | Public / User |
+| **#8** | **Activity Search** | `/cities` / Slide-overs | Experiences with costs and duration | Public / User |
+| **#9** | **Budget Analytics** | `/trips/[id]/budget` | Category pie chart, daily bar chart, alerts | User |
 | **#10** | **Trip Calendar** | `/trips/[id]/calendar` | Month/day grid and milestone inspector | User |
-| **#11** | **Community Tab (Screen 10)** | `/community` | Traveler feed, stories, one-click cloning | Public / User |
+| **#11** | **Community Tab (Screen 10)** | [`/community`](https://glob-trotter-odoo-ld.vercel.app/community) | Traveler feed, stories, one-click cloning | Public / User |
 | **#12** | **Public Shared Journal** | `/trip/[shareSlug]` | Read-only spread with dynamic OpenGraph meta | Public |
-| **#13** | **User Profile & Settings** | `/settings` | Bio, language preferences, saved cities | User |
-| **#14** | **Admin Analytics HQ** | `/admin` | Growth trends, top destinations ranking, role mgmt | Admin |
+| **#13** | **User Profile & Settings** | [`/settings`](https://glob-trotter-odoo-ld.vercel.app/settings) | Bio, language preferences, saved cities | User |
+| **#14** | **Admin Analytics HQ** | [`/admin`](https://glob-trotter-odoo-ld.vercel.app/admin) | Growth trends, top destinations ranking, role mgmt | Admin |
 | **#15** | **Packing Checklist** | `/trips/[id]/packing` | Automated packing categories with progress tracker | User |
-| **#16** | **Legal Documentation** | `/terms`, `/privacy` | Substantive plain-language privacy and terms | Public |
+| **#16** | **Legal Documentation** | [`/terms`](https://glob-trotter-odoo-ld.vercel.app/terms), [`/privacy`](https://glob-trotter-odoo-ld.vercel.app/privacy) | Plain-language privacy and terms | Public |
 
 ---
 
@@ -256,7 +307,7 @@ GlobeTrotter is built upon a strict **hand-kept travel journal aesthetic**:
 Colors:
   --paper:    #F4EDDD  (warm cream paper base)
   --kraft:    #D9C4A0  (kraft paper secondary, card backs, tape)
-  --ink:      #2E2A25  (warm near-black text, never #000)
+  --ink:      #2E2A25  (warm near-black text, never pure #000)
   --postal:   #B33A2E  (postmark red for stamps & primary CTAs)
   --moss:     #5F7048  (moss green for confirmations & budget-ok)
   --marigold: #DFA13B  (marigold yellow for alerts & highlights)
@@ -269,19 +320,19 @@ Typography:
 
 Textures & Edges:
   - 0–2px irregular clip-path jittered polygons (hand-cut feel).
-  - Washi tape clips and offset paper shadow shapes (no blurred drop shadows).
+  - Washi tape clips and offset paper shadow shapes (no generic blurred drop shadows).
   - Custom hand-perturbed single-weight SVG icons.
 ```
 
 ---
 
-## 🚀 Quick Start & Installation
+## 🚀 Quick Start & Local Setup
 
 ### Prerequisites
 - Node.js `v18+` or `v20+`
 - PostgreSQL database (or Neon Cloud instance)
 
-### 1. Repository Setup
+### 1. Repository Clone
 ```bash
 git clone https://github.com/kalp-cg/globTrotter-odooLD.git
 cd globTrotter-odooLD
@@ -291,11 +342,6 @@ cd globTrotter-odooLD
 ```bash
 cd backend
 npm install
-
-# Configure environment in backend/.env
-# PORT=5000
-# DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require
-# JWT_SECRET=your_jwt_secret
 
 # Seed database with demo trips, cities, activities, and users:
 npx tsx src/run-seed.ts
@@ -319,7 +365,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Testing & Quality Assurance
 
-GlobeTrotter features an automated test suite verifying all API endpoints, authentication flows, relational database triggers, and timeline calculations:
+GlobeTrotter features an automated integration test suite verifying all API endpoints, authentication flows, relational database triggers, and timeline calculations:
 
 ```bash
 cd backend

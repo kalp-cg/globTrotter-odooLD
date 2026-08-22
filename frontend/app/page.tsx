@@ -152,10 +152,10 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { title: "Two-Page Journal Spreads", desc: "View every trip like a keepsake journal with washi tape photos, handwritten day headers, and route lines." },
-                { title: "Physical Sequence Flow", desc: "Day-by-day activity sequencing with downward connecting arrows and duration badges." },
-                { title: "Luggage Tag Budgeting", desc: "Live category pie charts and per-day expense monitors prevent unexpected budget surprises." },
-                { title: "Cloneable Field Notes", desc: "Explore trips published by fellow travelers and copy complete itineraries to your account with one click." }
+                { icon: "📖", title: "Two-Page Journal Spreads", desc: "View every trip like a keepsake journal with washi tape photos, handwritten day headers, and route lines." },
+                { icon: "🧭", title: "Physical Sequence Flow", desc: "Day-by-day activity sequencing with downward connecting arrows and duration badges." },
+                { icon: "🏷️", title: "Luggage Tag Budgeting", desc: "Live category pie charts and per-day expense monitors prevent unexpected budget surprises." },
+                { icon: "✨", title: "Cloneable Field Notes", desc: "Explore trips published by fellow travelers and copy complete itineraries to your account with one click." }
               ].map((feature, idx) => (
                 <div key={idx} className="bg-paper border border-kraft p-5 space-y-2 shadow-sm"
                      style={{ transform: `rotate(${idx % 2 === 0 ? '-0.5deg' : '0.5deg'})` }}

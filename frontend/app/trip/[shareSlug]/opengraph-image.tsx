@@ -9,7 +9,8 @@ export default async function Image({ params }: { params: { shareSlug: string } 
   const { shareSlug } = params;
   
   // Notice we use the same public fetcher to get the data safely
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://globtrotter-odoold-lgh6.onrender.com/api";
+  const apiUrl = rawUrl.endsWith("/api") ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
   let tripData = null;
 
   try {

@@ -24,7 +24,7 @@ export class CitiesController {
   static async ensureCity(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await CitiesService.ensureCity(req.body);
-      return sendSuccess(res, data, 201);
+      return sendSuccess(res, data, 'City ensured', 201);
     } catch (err) {
       next(err);
     }

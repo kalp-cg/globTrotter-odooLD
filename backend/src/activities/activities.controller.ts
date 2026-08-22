@@ -14,7 +14,7 @@ export class ActivitiesController {
 
   static async getActivityById(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await ActivitiesService.getActivityById(req.params.id);
+      const data = await ActivitiesService.getActivityById(req.params.id as string);
       res.json({ success: true, data: data });
     } catch (error) {
       next(error);

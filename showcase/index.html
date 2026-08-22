@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GlobeTrotter — Visual Showcase & Live Deployment Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Kalam:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-vintage: #FBF8F1;
+      --paper: #FFFFFF;
+      --ink: #1C1917;
+      --postal: #2563EB;
+      --stamp-red: #DC2626;
+      --kraft: #D6C7A1;
+      --gold: #D97706;
+      --pine: #059669;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-vintage);
+      color: var(--ink);
+      font-family: 'Lora', serif;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      position: relative;
+    }
+
+    .badge-stamp {
+      display: inline-block;
+      border: 2px dashed var(--stamp-red);
+      color: var(--stamp-red);
+      padding: 0.35rem 1.25rem;
+      font-family: 'Courier Prime', monospace;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      transform: rotate(-2deg);
+    }
+
+    h1 {
+      font-family: 'Kalam', cursive;
+      font-size: 3.25rem;
+      color: #0F172A;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      color: #475569;
+      max-width: 750px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .metric-card {
+      background: var(--paper);
+      border: 1px solid var(--kraft);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .metric-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--postal);
+    }
+
+    .metric-label {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748B;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 2.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .screenshot-card {
+      background: var(--paper);
+      border: 2px solid var(--kraft);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .screenshot-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .screenshot-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #F8FAFC;
+    }
+
+    .screenshot-header h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0F172A;
+    }
+
+    .pill-tag {
+      background: #E0E7FF;
+      color: #3730A3;
+      padding: 0.2rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-family: 'Courier Prime', monospace;
+      font-weight: bold;
+    }
+
+    .screenshot-card img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+      border-bottom: 1px solid #E2E8F0;
+      cursor: zoom-in;
+    }
+
+    .screenshot-body {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .screenshot-body p {
+      font-size: 0.95rem;
+      color: #334155;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .deployment-section {
+      background: #0F172A;
+      color: #F8FAFC;
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-top: 3rem;
+      border: 1px solid #334155;
+    }
+
+    .deployment-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #38BDF8;
+    }
+
+    .deploy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .deploy-box {
+      background: #1E293B;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #475569;
+    }
+
+    .deploy-box h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      color: #F1F5F9;
+      margin-bottom: 0.75rem;
+    }
+
+    .deploy-code {
+      background: #090D16;
+      color: #34D399;
+      padding: 0.85rem;
+      border-radius: 6px;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.9rem;
+      color: #64748B;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge-stamp">✨ Seeded Database & Live Showcase</div>
+      <h1>GlobeTrotter Scrapbook</h1>
+      <p class="subtitle">
+        A tactile, scrapbook-inspired multi-city itinerary planner with live budget tracking, currency conversions, day-by-day sequence journal, and shared community journeys.
+      </p>
+    </header>
+
+    <!-- Real-time Seeded Metrics -->
+    <div class="metrics-bar">
+      <div class="metric-card">
+        <div class="metric-value">25+</div>
+        <div class="metric-label">Seeded Expedition Trips</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">100%</div>
+        <div class="metric-label">Production Build Passed</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">7+ Currencies</div>
+        <div class="metric-label">Instant Live Converter</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">Screen 9 & 10</div>
+        <div class="metric-label">Journal & Traveler Network</div>
+      </div>
+    </div>
+
+    <!-- Screenshots Showcase Gallery -->
+    <div class="gallery-grid">
+      
+      <!-- 1. Landing & Itinerary Dashboard -->
+      <div class="screenshot-card">
+        <div class="screenshot-header">
+          <h3>1. Expedition Hub & Itineraries</h3>
+          <span class="pill-tag">Home View</span>
+        </div>
+        <img src="screenshots/landing_page.png" alt="GlobeTrotter Landing Page" />
+        <div class="screenshot-body">
+          <p>The main dashboard featuring authentic scrapbook typography (Kalam/Lora), seeded expedition trips, destination discovery, and quick action cards.</p>
+          <ul class="feature-list">
+            <li>✅ Multi-city cards with live cover photography</li>
+            <li>✅ Vintage postage stamps & washi tape borders</li>
+            <li>✅ Instant trip creator & quick filters</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2. Community Stories (Screen 10) -->
+      <div class="screenshot-card">
+        <div class="screenshot-header">
+          <h3>2. Community Network (Screen 10)</h3>
+          <span class="pill-tag">Wireframe 10</span>
+        </div>
+        <img src="screenshots/community_stories.png" alt="GlobeTrotter Community Stories" />
+        <div class="screenshot-body">
+          <p>Global traveler feed with traveler avatars on the left, rich story field notes on the right, and single-click itinerary cloning.</p>
+          <ul class="feature-list">
+            <li>✅ One-click itinerary cloning into workspace</li>
+            <li>✅ Curated high-res destination photo chips</li>
+            <li>✅ Public shareable journals with OpenGraph tags</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3. Day-by-Day Sequence Journal (Screen 9) -->
+      <div class="screenshot-card">
+        <div class="screenshot-header">
+          <h3>3. Day-by-Day Journal (Screen 9)</h3>
+          <span class="pill-tag">Wireframe 9</span>
+        </div>
+        <img src="screenshots/trip_details.png" alt="Day-by-Day Scrapbook Journal" />
+        <div class="screenshot-body">
+          <p>Chronological two-column itinerary flow with downward sequence flow arrows (↓), activity scheduling, and category luggage tag budgets.</p>
+          <ul class="feature-list">
+            <li>✅ Two-column layout: Physical Flow & Expense Stub</li>
+            <li>✅ Live multi-currency conversion (USD/EUR/GBP/JPY/INR)</li>
+            <li>✅ Printable scrapbook export & budget monitoring</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4. Authentication & User Profile -->
+      <div class="screenshot-card">
+        <div class="screenshot-header">
+          <h3>4. User Access & Auth Vault</h3>
+          <span class="pill-tag">Auth View</span>
+        </div>
+        <img src="screenshots/auth_view.png" alt="GlobeTrotter Auth View" />
+        <div class="screenshot-body">
+          <p>Secure JWT authentication and registration system seamlessly styled with craft aesthetic, instant login, and role-based permissions.</p>
+          <ul class="feature-list">
+            <li>✅ Token-based authentication & refresh tokens</li>
+            <li>✅ Admin analytics dashboard access</li>
+            <li>✅ Personal travel preferences & saved destinations</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Deployment Guidelines -->
+    <div class="deployment-section">
+      <h2>🚀 Deployment Playbook: Render (Backend) & Vercel (Frontend)</h2>
+      <div class="deploy-grid">
+        
+        <div class="deploy-box">
+          <h4>🌐 1. Backend Service on Render</h4>
+          <p style="font-size: 0.9rem; color: #94A3B8;">Web Service deployment with Node.js and PostgreSQL connection.</p>
+          <div class="deploy-code">
+            <strong>Root Directory:</strong> backend<br/>
+            <strong>Build Command:</strong> npm install &amp;&amp; npm run build<br/>
+            <strong>Start Command:</strong> npm start<br/>
+            <strong>Environment Variables:</strong><br/>
+            - DATABASE_URL (PostgreSQL connection string)<br/>
+            - JWT_SECRET (Session security token)<br/>
+            - CORS_ORIGIN = *
+          </div>
+        </div>
+
+        <div class="deploy-box">
+          <h4>⚡ 2. Frontend App on Vercel</h4>
+          <p style="font-size: 0.9rem; color: #94A3B8;">Next.js 16 App Router optimized for global CDN edge deployment.</p>
+          <div class="deploy-code">
+            <strong>Root Directory:</strong> frontend<br/>
+            <strong>Framework Preset:</strong> Next.js<br/>
+            <strong>Build Command:</strong> next build<br/>
+            <strong>Output Directory:</strong> .next<br/>
+            <strong>Environment Variables:</strong><br/>
+            - NEXT_PUBLIC_API_URL (Render backend URL e.g. https://your-backend.onrender.com)
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer>
+      <p>GlobeTrotter Travel Platform • Handcrafted with Next.js, TypeScript, PostgreSQL & Scrapbook Tokens</p>
+    </footer>
+  </div>
+</body>
+</html>

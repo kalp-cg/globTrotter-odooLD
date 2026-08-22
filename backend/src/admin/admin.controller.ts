@@ -50,7 +50,7 @@ export class AdminController {
 
   static async getUserTrips(req: Request, res: Response, next: NextFunction) {
     try {
-      const trips = await AdminService.getUserTrips(req.params.id);
+      const trips = await AdminService.getUserTrips(req.params.id as string);
       res.json(trips);
     } catch (error) {
       next(error);
@@ -59,7 +59,7 @@ export class AdminController {
 
   static async toggleUserRole(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await AdminService.toggleUserRole(req.params.id);
+      const user = await AdminService.toggleUserRole(req.params.id as string);
       res.json(user);
     } catch (error) {
       next(error);
@@ -68,7 +68,7 @@ export class AdminController {
 
   static async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
-      await AdminService.deleteUser(req.params.id);
+      await AdminService.deleteUser(req.params.id as string);
       res.json({ success: true });
     } catch (error) {
       next(error);

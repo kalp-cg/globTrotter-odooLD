@@ -54,7 +54,7 @@ export class CitiesService {
             headers: { 'User-Agent': 'GlobeTrotterApp/1.0 (http://globetrotter.local; contact@globetrotter.local)' }
           });
           if (wikiRes.ok) {
-            const wikiData = await wikiRes.json();
+            const wikiData: any = await wikiRes.json();
             if (wikiData.thumbnail?.source) {
               city.image_url = wikiData.thumbnail.source;
             } else if (wikiData.originalimage?.source) {
