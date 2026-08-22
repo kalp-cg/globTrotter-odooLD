@@ -152,15 +152,15 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { icon: "📖", title: "Two-Page Journal Spreads", desc: "View every trip like a keepsake journal with washi tape photos, handwritten day headers, and route lines." },
-                { icon: "↓", title: "Physical Sequence Flow", desc: "Day-by-day activity sequencing with downward connecting arrows and duration badges." },
-                { icon: "🏷️", title: "Luggage Tag Budgeting", desc: "Live category pie charts and per-day expense monitors prevent unexpected budget surprises." },
-                { icon: "🤝", title: "Cloneable Field Notes", desc: "Explore trips published by fellow travelers and copy complete itineraries to your account with one click." }
+                { title: "Two-Page Journal Spreads", desc: "View every trip like a keepsake journal with washi tape photos, handwritten day headers, and route lines." },
+                { title: "Physical Sequence Flow", desc: "Day-by-day activity sequencing with downward connecting arrows and duration badges." },
+                { title: "Luggage Tag Budgeting", desc: "Live category pie charts and per-day expense monitors prevent unexpected budget surprises." },
+                { title: "Cloneable Field Notes", desc: "Explore trips published by fellow travelers and copy complete itineraries to your account with one click." }
               ].map((feature, idx) => (
                 <div key={idx} className="bg-paper border border-kraft p-5 space-y-2 shadow-sm"
                      style={{ transform: `rotate(${idx % 2 === 0 ? '-0.5deg' : '0.5deg'})` }}
                 >
-                  <span className="text-3xl block mb-2">{feature.icon}</span>
+                  {feature.icon && <span className="text-3xl block mb-2">{feature.icon}</span>}
                   <h3 className="font-display text-xl text-ink font-bold">{feature.title}</h3>
                   <p className="font-body text-xs text-ink/75 leading-relaxed">{feature.desc}</p>
                 </div>
@@ -242,7 +242,7 @@ export default function HomePage() {
           </StampButton>
 
           <span className="font-mono text-xs text-ink/50 italic">
-            ✈️ {trips.length} journeys currently charted
+            {trips.length} journeys currently charted
           </span>
         </div>
       </section>
@@ -252,7 +252,6 @@ export default function HomePage() {
                style={{ transform: "rotate(0.3deg)" }}
       >
         <div className="flex items-center gap-3">
-          <span className="text-lg">🧭</span>
           <span><strong>Field Motto:</strong> “Travel isn't about rushing from point A to B; it's about the footnotes gathered along the way.”</span>
         </div>
         <Link href="/community" className="text-postal hover:underline font-bold shrink-0">
@@ -329,17 +328,16 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
           {[
-            { step: "01", icon: "📍", title: "Add City Legs", desc: "Sequence multi-destination stops, assign arrival/departure dates, and reorder legs dynamically with drag & drop." },
-            { step: "02", icon: "🏛️", title: "Schedule Activities", desc: "Attach curated tours, cultural landmarks, and dining spots to each stop with estimated times and durations." },
-            { step: "03", icon: "💳", title: "Monitor Budgets", desc: "Live categorical expense breakdowns and daily tracking charts ensure your expedition stays on target." },
-            { step: "04", icon: "🎒", title: "Pack & Share", desc: "Tick off gear from your tailored packing checklist and publish field notes for fellow travelers to clone." },
+            { step: "01", title: "Add City Legs", desc: "Sequence multi-destination stops, assign arrival/departure dates, and reorder legs dynamically with drag & drop." },
+            { step: "02", title: "Schedule Activities", desc: "Attach curated tours, cultural landmarks, and dining spots to each stop with estimated times and durations." },
+            { step: "03", title: "Monitor Budgets", desc: "Live categorical expense breakdowns and daily tracking charts ensure your expedition stays on target." },
+            { step: "04", title: "Pack & Share", desc: "Tick off gear from your tailored packing checklist and publish field notes for fellow travelers to clone." },
           ].map((item, idx) => (
             <div key={idx} className="bg-kraft/15 border border-kraft p-4 space-y-2 relative"
                  style={{ transform: `rotate(${idx % 2 === 0 ? '-0.5deg' : '0.5deg'})` }}
             >
               <div className="flex justify-between items-center">
                 <span className="font-display text-2xl font-bold text-postal">{item.step}</span>
-                <span className="text-xl">{item.icon}</span>
               </div>
               <h3 className="font-display text-lg text-ink font-bold">{item.title}</h3>
               <p className="font-body text-xs text-ink/70 leading-relaxed">{item.desc}</p>
@@ -459,7 +457,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h4 className="font-display text-base text-ink leading-none">{post.user_name || 'Traveler'}</h4>
-                    <span className="font-mono text-[10px] text-ink/50">{post.trip_name ? `📍 ${post.trip_name}` : 'Shared Story'}</span>
+                    <span className="font-mono text-[10px] text-ink/50">{post.trip_name ? post.trip_name : 'Shared Story'}</span>
                   </div>
                 </div>
                 <p className="font-body text-xs text-ink/80 line-clamp-2 italic">“{post.caption}”</p>
