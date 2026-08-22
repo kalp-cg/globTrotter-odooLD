@@ -36,7 +36,13 @@ export default function CreateTripPage() {
       setNameError("");
     }
 
-    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+    if (!startDate) {
+      setDateError("Start date is required");
+      hasError = true;
+    } else if (!endDate) {
+      setDateError("End date is required");
+      hasError = true;
+    } else if (new Date(endDate) < new Date(startDate)) {
       setDateError("End date must be after start date");
       hasError = true;
     } else {
@@ -49,8 +55,8 @@ export default function CreateTripPage() {
     createTrip.mutate(
       {
         name,
-        startDate,
-        endDate,
+        start_date: startDate,
+        end_date: endDate,
         description: destination ? `Destination: ${destination}` : undefined,
       },
       {
