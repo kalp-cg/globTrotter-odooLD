@@ -10,3 +10,10 @@ export function getCities(params?: Record<string, string>, options?: RequestInit
 export function getCity(id: string): Promise<City> {
   return apiClient(`/cities/${id}`);
 }
+
+export function ensureCity(cityData: Partial<City>): Promise<{ id: string }> {
+  return apiClient(`/cities/ensure`, {
+    method: "POST",
+    body: JSON.stringify(cityData),
+  });
+}
