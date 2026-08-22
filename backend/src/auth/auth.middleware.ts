@@ -42,3 +42,24 @@ export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction
     next();
   });
 }
+
+// Attaches user to req if a valid token is present, but does NOT reject unauthenticated requests.
+export function optionalAuth(req: AuthRequest, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next(); // No token — proceed without user
+  }
+  const token = authHeader.substring(7);
+  try {
+    const payload = jwt.verify(token, env.JWT_SECRET) as any;
+    req.user = {
+      userId: payload.userId,
+      email: payload.email,
+      isAdmin: !!payload.isAdmin,
+      name: payload.name
+    };
+  } catch (_) {
+    // Invalid token — treat as unauthenticated
+  }
+  next();
+}
