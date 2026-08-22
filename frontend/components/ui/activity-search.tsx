@@ -16,7 +16,7 @@ interface ActivitySearchProps {
   cityId: string;
   startDate?: string;
   endDate?: string;
-  onSelectActivity: (activityId: string, cost: number, date: string) => void;
+  onSelectActivity: (activityId: string, cost: number, date: string, activity?: any) => void;
   className?: string;
 }
 
@@ -62,18 +62,18 @@ export function ActivitySearch({ cityId, startDate, endDate, onSelectActivity, c
     return dates;
   }, [startDate, endDate]);
 
-  const handleSelect = (actId: string, cost: number, dateStr: string) => {
+  const handleSelect = (actId: string, cost: number, dateStr: string, activityObj: any) => {
     setAddingActivityId(actId);
     // Brief animation before invoking callback
     setTimeout(() => {
-      onSelectActivity(actId, cost, dateStr);
+      onSelectActivity(actId, cost, dateStr, activityObj);
       setAddingActivityId(null);
       setExpandedActivityId(null);
     }, 400);
   };
 
   return (
-    <div className={`flex flex-col h-full ${className}`}>
+    <div className={`flex flex-col h-full min-h-0 ${className}`}>
       
       {/* Search Header */}
       <div className="shrink-0 mb-6 space-y-4">
@@ -102,10 +102,10 @@ export function ActivitySearch({ cityId, startDate, endDate, onSelectActivity, c
                   key={cat}
                   onClick={() => setSelectedCategory(isSelected ? null : cat)}
                   className={`
-                    font-display text-xs px-2 py-1 border-2 transition-all transform hover:-translate-y-0.5
+                    font-display text-xs px-2 py-1 transition-all transform hover:-translate-y-0.5
                     ${isSelected 
-                      ? "border-postal text-postal bg-postal/10 rotate-1 shadow-sm" 
-                      : "border-kraft text-ink/60 hover:text-ink hover:border-ink/40 -rotate-1"}
+                      ? "bg-postal text-paper shadow-sm" 
+                      : "bg-paper text-ink/60 border border-kraft hover:text-ink hover:border-ink/40"}
                   `}
                   style={{ borderRadius: "2px", borderStyle: isSelected ? "solid" : "dashed" }}
                 >
@@ -132,7 +132,7 @@ export function ActivitySearch({ cityId, startDate, endDate, onSelectActivity, c
       </div>
 
       {/* Results List */}
-      <div ref={parentRef} className="flex-1 overflow-y-auto pr-2">
+      <div ref={parentRef} className="flex-1 min-h-0 overflow-y-auto pr-2">
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4].map(i => (
@@ -206,7 +206,7 @@ export function ActivitySearch({ cityId, startDate, endDate, onSelectActivity, c
                             {dateOptions.map(d => (
                               <button
                                 key={d.toISOString()}
-                                onClick={() => handleSelect(act.id, act.estCost || 0, d.toISOString())}
+                                onClick={() => handleSelect(act.id, act.estCost || act.est_cost || 0, d.toISOString(), act)}
                                 className="shrink-0 bg-kraft/10 hover:bg-postal hover:text-paper text-ink font-display text-sm px-3 py-1 rounded-sm border border-kraft transition-colors"
                               >
                                 {d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })}
