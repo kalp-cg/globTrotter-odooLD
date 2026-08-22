@@ -82,8 +82,11 @@ export async function initDatabase() {
       cost_index DECIMAL(5, 2) DEFAULT 1.0,
       popularity_score DECIMAL(5, 2) DEFAULT 8.0,
       image_url VARCHAR(500),
-      description TEXT
+      description TEXT,
+      external_id VARCHAR(255) UNIQUE
     );
+
+    ALTER TABLE cities ADD COLUMN IF NOT EXISTS external_id VARCHAR(255) UNIQUE;
 
     CREATE TABLE IF NOT EXISTS stops (
       id UUID PRIMARY KEY,
@@ -197,7 +200,10 @@ async function seedData() {
     { id: 'c1010101-0000-0000-0000-000000000014', name: 'Mumbai', country: 'India', region: 'South Asia', cost_index: 2.0, popularity_score: 9.2, image_url: 'https://images.unsplash.com/photo-1522262590532-a991489a0253?w=800&auto=format&fit=crop&q=80', description: 'The City of Dreams. India’s financial center and home to the Bollywood film industry.' },
     { id: 'c1010101-0000-0000-0000-000000000015', name: 'Jaipur', country: 'India', region: 'South Asia', cost_index: 1.5, popularity_score: 9.0, image_url: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&auto=format&fit=crop&q=80', description: 'The Pink City of India, known for its royal palaces, vibrant markets, and historic forts.' },
     { id: 'c1010101-0000-0000-0000-000000000016', name: 'Varanasi', country: 'India', region: 'South Asia', cost_index: 1.0, popularity_score: 8.8, image_url: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop&q=80', description: 'One of the world’s oldest continually inhabited cities, the spiritual capital of India.' },
-    { id: 'c1010101-0000-0000-0000-000000000017', name: 'Kochi', country: 'India', region: 'South Asia', cost_index: 1.4, popularity_score: 8.7, image_url: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&auto=format&fit=crop&q=80', description: 'A vibrant city in Kerala known for its Chinese fishing nets and beautiful backwaters.' }
+    { id: 'c1010101-0000-0000-0000-000000000017', name: 'Kochi', country: 'India', region: 'South Asia', cost_index: 1.4, popularity_score: 8.7, image_url: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&auto=format&fit=crop&q=80', description: 'A vibrant city in Kerala known for its Chinese fishing nets and beautiful backwaters.' },
+    { id: 'c1010101-0000-0000-0000-000000000018', name: 'Cape Town', country: 'South Africa', region: 'Africa', cost_index: 2.8, popularity_score: 9.1, image_url: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800&auto=format&fit=crop&q=80', description: 'Stunning coastal city known for Table Mountain, diverse cultures, and nearby vineyards.' },
+    { id: 'c1010101-0000-0000-0000-000000000019', name: 'Istanbul', country: 'Turkey', region: 'Europe/Asia', cost_index: 2.1, popularity_score: 9.3, image_url: 'https://images.unsplash.com/photo-1522083111301-a4faed67e816?w=800&auto=format&fit=crop&q=80', description: 'The cultural bridge between Europe and Asia, featuring the Hagia Sophia and bustling bazaars.' },
+    { id: 'c1010101-0000-0000-0000-000000000020', name: 'Seoul', country: 'South Korea', region: 'Asia', cost_index: 3.3, popularity_score: 9.4, image_url: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?w=800&auto=format&fit=crop&q=80', description: 'A dynamic metropolis where high-tech subways and pop culture meet Buddhist temples and palaces.' }
   ];
 
   for (const c of cities) {
