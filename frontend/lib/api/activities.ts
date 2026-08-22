@@ -10,3 +10,10 @@ export function getActivities(params?: Record<string, string | number>, options?
 export function getActivity(id: string): Promise<Activity> {
   return apiClient(`/activities/${id}`);
 }
+
+export function ensureActivity(activity: any): Promise<Activity> {
+  return apiClient(`/activities/ensure`, {
+    method: "POST",
+    body: JSON.stringify(activity),
+  });
+}
