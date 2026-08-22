@@ -3,6 +3,7 @@ import { Kalam, Lora, Courier_Prime } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { AuthGuard } from "@/components/auth-guard";
+import { Navbar } from "@/components/ui/navbar";
 
 // Display/handwritten: headers, stickers, annotations, stamps
 const kalam = Kalam({
@@ -39,6 +40,7 @@ export default function RootLayout({
     <html lang="en" className={`${kalam.variable} ${lora.variable} ${courier.variable}`} suppressHydrationWarning>
       <body className="antialiased selection:bg-marigold selection:text-ink">
         <Providers>
+          <Navbar />
           <AuthGuard>{children}</AuthGuard>
         </Providers>
       </body>
