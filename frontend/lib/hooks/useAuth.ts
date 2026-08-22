@@ -1,0 +1,61 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { login, signup, logout, getMe } from "../api/auth";
+import { useRouter } from "next/navigation";
+
+export function useAuth() {
+  const query = useQuery({
+    queryKey: ["auth", "me"],
+    queryFn: getMe,
+    retry: false, // Don't retry if unauthenticated
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return {
+    user: query.data,
+    isLoading: query.isLoading,
+    error: query.error,
+    isAuthenticated: !!query.data,
+  };
+}
+
+export function useLogin() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: login,
+    onSuccess: (data) => {
+      // If we use bearer tokens: localStorage.setItem("accessToken", data.token);
+      queryClient.setQueryData(["auth", "me"], data.user);
+      router.push("/");
+    },
+  });
+}
+
+export function useSignup() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: signup,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["auth", "me"], data.user);
+      router.push("/");
+    },
+  });
+}
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      // localStorage.removeItem("accessToken");
+      queryClient.setQueryData(["auth", "me"], null);
+      queryClient.clear(); // Clear all cached data
+      router.push("/login");
+    },
+  });
+}
