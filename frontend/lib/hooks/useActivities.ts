@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { getActivities, getActivity } from "../api/activities";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getActivities, getActivity, ensureActivity } from "../api/activities";
 
 export function useActivities(params?: Record<string, string | number>) {
   return useQuery({
@@ -15,5 +15,11 @@ export function useActivity(activityId: string) {
     queryFn: () => getActivity(activityId),
     enabled: !!activityId,
     staleTime: 1000 * 60 * 60,
+  });
+}
+
+export function useEnsureActivity() {
+  return useMutation({
+    mutationFn: (activity: any) => ensureActivity(activity),
   });
 }
