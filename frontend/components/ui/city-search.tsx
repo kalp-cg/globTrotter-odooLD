@@ -38,12 +38,12 @@ export function CitySearch({ onSelectCity, className = "" }: CitySearchProps) {
   const rowVirtualizer = useVirtualizer({
     count: cities?.length || 0,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 100, // Estimated height of a row
+    estimateSize: () => 130, // Estimated height of a row
     overscan: 5,
   });
 
   return (
-    <div className={`flex flex-col h-full ${className}`}>
+    <div className={`flex flex-col h-full min-h-0 ${className}`}>
       
       {/* Search Header */}
       <div className="shrink-0 mb-6 space-y-4">
@@ -91,7 +91,7 @@ export function CitySearch({ onSelectCity, className = "" }: CitySearchProps) {
       {/* Results List */}
       <div 
         ref={parentRef} 
-        className="flex-1 overflow-y-auto pr-2"
+        className="flex-1 min-h-0 overflow-y-auto pr-2"
       >
         {isLoading ? (
           <div className="space-y-4">
@@ -140,8 +140,8 @@ export function CitySearch({ onSelectCity, className = "" }: CitySearchProps) {
 
                     {/* Stats */}
                     <div className="hidden md:flex flex-col gap-1 items-end shrink-0">
-                      <LuggageTag text={`Cost: ${city.costIndex}/5`} className="bg-kraft/50 text-ink text-xs py-0.5 px-2" />
-                      <LuggageTag text={`Pop: ${city.popularityScore}`} className="bg-postal/10 text-postal text-xs py-0.5 px-2" />
+                      <LuggageTag text={`Cost: ${city.costIndex ?? city.cost_index ?? '?'}/5`} className="bg-kraft/50 text-ink text-xs py-0.5 px-2" />
+                      <LuggageTag text={`Pop: ${city.popularityScore ?? city.popularity_score ?? '?'}`} className="bg-postal/10 text-postal text-xs py-0.5 px-2" />
                     </div>
 
                     {/* Action */}
