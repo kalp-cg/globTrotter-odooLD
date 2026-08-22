@@ -131,3 +131,29 @@ export function Chevron(props: React.SVGProps<SVGSVGElement> & { direction?: 'up
     </svg>
   );
 }
+
+export function Check(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" {...props}>
+      <path d="M20 6L9 17l-5-5" {...strokeProps} />
+    </svg>
+  );
+}
+
+export function Search(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" {...props}>
+      <circle cx="11" cy="11" r="8" {...strokeProps} />
+      <path d="M21 21l-4.35-4.35" {...strokeProps} />
+    </svg>
+  );
+}
+
+export function Camera(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" {...props}>
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" {...strokeProps} />
+      <circle cx="12" cy="13" r="4" {...strokeProps} />
+    </svg>
+  );
+}
