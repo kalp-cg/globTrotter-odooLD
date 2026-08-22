@@ -183,7 +183,7 @@ export function ActivitySearch({ cityId, startDate, endDate, onSelectActivity, c
                         <div className="flex gap-4 mt-2 font-body text-[10px] text-ink/50 uppercase tracking-widest font-semibold">
                           <span>{act.category}</span>
                           <span>•</span>
-                          <span>{Math.round(act.estDurationMins / 60)}h</span>
+                          <span>{Math.round((act.estDurationMins || 60) / 60)}h</span>
                         </div>
                       </div>
                     </div>
@@ -206,7 +206,7 @@ export function ActivitySearch({ cityId, startDate, endDate, onSelectActivity, c
                             {dateOptions.map(d => (
                               <button
                                 key={d.toISOString()}
-                                onClick={() => handleSelect(act.id, act.estCost, d.toISOString())}
+                                onClick={() => handleSelect(act.id, act.estCost || 0, d.toISOString())}
                                 className="shrink-0 bg-kraft/10 hover:bg-postal hover:text-paper text-ink font-display text-sm px-3 py-1 rounded-sm border border-kraft transition-colors"
                               >
                                 {d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })}

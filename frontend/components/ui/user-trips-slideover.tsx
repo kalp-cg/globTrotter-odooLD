@@ -14,7 +14,8 @@ interface UserTripsSlideoverProps {
 }
 
 export function UserTripsSlideover({ userId, userName, onClose }: UserTripsSlideoverProps) {
-  const { data: trips, isLoading } = useAdminUserTrips(userId);
+  const { data: rawTrips, isLoading } = useAdminUserTrips(userId);
+  const trips: any[] = Array.isArray(rawTrips) ? rawTrips : ((rawTrips as any)?.data || []);
 
   // Close on Escape key
   useEffect(() => {
@@ -65,13 +66,13 @@ export function UserTripsSlideover({ userId, userName, onClose }: UserTripsSlide
                   <PaperSkeleton className="w-full h-24 mb-4" />
                   <PaperSkeleton className="w-full h-24" />
                 </>
-              ) : trips?.length === 0 ? (
+              ) : trips.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-ink/40 font-body text-center space-y-4">
                   <span className="font-display text-4xl">🧳</span>
                   <p>This user hasn't created any trips yet.</p>
                 </div>
               ) : (
-                trips?.map((trip: any) => (
+                trips.map((trip: any) => (
                   <div 
                     key={trip.id} 
                     className="bg-paper border-2 border-kraft p-4 shadow-sm relative group hover:shadow-md transition-shadow"
@@ -80,16 +81,16 @@ export function UserTripsSlideover({ userId, userName, onClose }: UserTripsSlide
                     <div className="absolute top-2 right-2 flex gap-2">
                       {trip.is_public && <LuggageTag text="Public" className="bg-moss/10 text-moss" />}
                     </div>
-                    <h3 className="font-display text-xl text-ink pr-16">{trip.title}</h3>
+                    <h3 className="font-display text-xl text-ink pr-16">{trip.name || trip.title}</h3>
                     
                     <div className="flex gap-4 mt-3 font-mono text-xs text-ink/70">
                       <div>
                         <span className="block text-ink/40 mb-1">Start Date</span>
-                        {new Date(trip.start_date).toLocaleDateString()}
+                        {trip.start_date ? new Date(trip.start_date).toLocaleDateString() : 'Flexible'}
                       </div>
                       <div>
                         <span className="block text-ink/40 mb-1">End Date</span>
-                        {new Date(trip.end_date).toLocaleDateString()}
+                        {trip.end_date ? new Date(trip.end_date).toLocaleDateString() : ''}
                       </div>
                     </div>
                   </div>

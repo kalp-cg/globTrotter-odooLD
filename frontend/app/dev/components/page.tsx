@@ -102,7 +102,7 @@ export default function ComponentsDevPage() {
           
           <div className="mt-16 flex items-center gap-4">
             <span className="font-body text-ink">Success Checkmark:</span>
-            <ScribbleCheck size={32} />
+            <ScribbleCheck show={true} className="w-8 h-8" />
           </div>
         </div>
       </section>
