@@ -131,7 +131,7 @@ export default function ItineraryBuilderPage() {
     });
   };
 
-  const handleAddActivity = (activityId: string, cost: number) => {
+  const handleAddActivity = (activityId: string, cost: number, date: string) => {
     setIsActivitySearchOpen(false);
     if (selectedStopId) {
       addActivity.mutate({
@@ -139,7 +139,7 @@ export default function ItineraryBuilderPage() {
         data: {
           activity_id: activityId,
           actual_cost: cost,
-          scheduled_date: selectedStop?.arrivalDate
+          scheduled_date: date
         }
       });
     }
@@ -296,15 +296,31 @@ export default function ItineraryBuilderPage() {
 
                 <div className="flex-1 overflow-y-auto space-y-3 pb-20 pr-2">
                   {selectedStop.activities?.length ? selectedStop.activities.map((act) => (
-                    <div key={act.stopActivityId || act.id} className="relative group bg-paper border border-kraft shadow-sm flex items-center">
+                    <motion.div 
+                      key={act.stopActivityId || act.id} 
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="relative group bg-paper border border-kraft shadow-sm flex items-center"
+                    >
                       <div className="w-2 h-full bg-postal absolute left-0 top-0 bottom-0" />
-                      <div className="flex-1 pl-6 pr-4 py-3 flex justify-between items-center">
+                      <div className="flex-1 pl-6 pr-4 py-3 flex justify-between items-center relative overflow-hidden">
+                        
+                        {/* Playful check overlay on initial mount */}
+                        <motion.div 
+                          initial={{ opacity: 1, scale: 0.5 }}
+                          animate={{ opacity: 0, scale: 2 }}
+                          transition={{ duration: 0.5, delay: 0.2 }}
+                          className="absolute inset-0 flex items-center justify-center pointer-events-none text-postal/20"
+                        >
+                          <Icons.Check className="w-24 h-24" />
+                        </motion.div>
+
                         <div>
                           <p className="font-display text-lg text-ink truncate">{act.activityName}</p>
                           <div className="flex gap-3 text-xs font-body text-ink/60 uppercase mt-1 tracking-wider">
                             <span>{new Date(act.scheduledDate || '').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                             <span>•</span>
-                            <span>{act.scheduledTime}</span>
+                            <span>{act.scheduledTime || `${Math.round((act.estDurationMins || 60)/60)}h`}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -325,7 +341,7 @@ export default function ItineraryBuilderPage() {
                           <div key={i} className="w-2 h-2 rounded-full bg-kraft -ml-1" />
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
                   )) : (
                     <p className="font-body text-ink/50 italic text-center py-8">No activities planned.</p>
                   )}
@@ -359,6 +375,8 @@ export default function ItineraryBuilderPage() {
           isOpen={isActivitySearchOpen} 
           onClose={() => setIsActivitySearchOpen(false)} 
           cityId={selectedStop?.cityId || ""}
+          startDate={selectedStop?.arrivalDate || undefined}
+          endDate={selectedStop?.departureDate || undefined}
           onSelectActivity={handleAddActivity}
         />
       )}
