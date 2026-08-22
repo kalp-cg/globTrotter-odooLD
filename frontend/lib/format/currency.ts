@@ -15,10 +15,10 @@ export const CURRENCY_RATES: Record<CurrencyCode, { symbol: string; rate: number
 };
 
 export function getSelectedCurrency(): CurrencyCode {
-  if (typeof window === "undefined") return "USD";
+  if (typeof window === "undefined") return "INR";
   const stored = localStorage.getItem("preferred_currency");
   if (stored && stored in CURRENCY_RATES) return stored as CurrencyCode;
-  return "USD";
+  return "INR";
 }
 
 export function setSelectedCurrency(currency: CurrencyCode) {
@@ -35,8 +35,8 @@ export function formatCurrency(
   const num = typeof amount === "number" ? amount : parseFloat(String(amount || 0));
   if (isNaN(num)) return "$0";
 
-  const curr = targetCurrency || (typeof window !== "undefined" ? getSelectedCurrency() : "USD");
-  const meta = CURRENCY_RATES[curr] || CURRENCY_RATES.USD;
+  const curr = targetCurrency || (typeof window !== "undefined" ? getSelectedCurrency() : "INR");
+  const meta = CURRENCY_RATES[curr] || CURRENCY_RATES.INR;
   const converted = num * meta.rate;
 
   return new Intl.NumberFormat("en-US", {
