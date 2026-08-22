@@ -2,7 +2,7 @@ import { apiClient } from "./client";
 import { User } from "./types";
 
 // TODO: Verify the login endpoint path (/auth/login) matches the backend
-export function login(data: any): Promise<{ user: User; token?: string }> {
+export function login(data: any): Promise<{ user: User; accessToken?: string; refreshToken?: string }> {
   return apiClient("/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
@@ -10,7 +10,7 @@ export function login(data: any): Promise<{ user: User; token?: string }> {
 }
 
 // TODO: Verify the signup endpoint path (/auth/signup) matches the backend
-export function signup(data: any): Promise<{ user: User; token?: string }> {
+export function signup(data: any): Promise<{ user: User; accessToken?: string; refreshToken?: string }> {
   return apiClient("/auth/signup", {
     method: "POST",
     body: JSON.stringify(data),

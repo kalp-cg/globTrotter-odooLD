@@ -24,8 +24,8 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
-      if (data.token) localStorage.setItem("accessToken", data.token);
+    onSuccess: (data: any) => {
+      if (data.accessToken) localStorage.setItem("accessToken", data.accessToken);
       queryClient.setQueryData(["auth", "me"], data.user);
       router.push("/");
     },
@@ -38,8 +38,8 @@ export function useSignup() {
 
   return useMutation({
     mutationFn: signup,
-    onSuccess: (data) => {
-      if (data.token) localStorage.setItem("accessToken", data.token);
+    onSuccess: (data: any) => {
+      if (data.accessToken) localStorage.setItem("accessToken", data.accessToken);
       queryClient.setQueryData(["auth", "me"], data.user);
       router.push("/");
     },
