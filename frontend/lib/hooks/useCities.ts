@@ -5,7 +5,7 @@ export function useCities(params?: Record<string, string>) {
   return useQuery({
     // Stable query key includes params so results cache across navigation
     queryKey: ["cities", params],
-    queryFn: () => getCities(params),
+    queryFn: ({ signal }) => getCities(params, { signal }),
     // Reference/static data: long staleTime
     staleTime: 1000 * 60 * 60, // 1 hour
   });

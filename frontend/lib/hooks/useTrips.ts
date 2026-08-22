@@ -55,13 +55,8 @@ export function useDeleteTrip() {
   return useMutation({
     mutationFn: deleteTrip,
     onMutate: async (deletedId) => {
-      // Optimistic update
       await queryClient.cancelQueries({ queryKey: ["trips"] });
-      
       const previousTrips = queryClient.getQueryData(["trips"]);
-      
-      // We don't perfectly mock infinite query invalidation here since it's complex,
-      // but we force a refetch on success. We can just rely on the UI hiding it first.
       return { previousTrips };
     },
     onSuccess: () => {
@@ -70,43 +65,122 @@ export function useDeleteTrip() {
   });
 }
 
-// Example with optimistic update for reordering stops
+export function useAddStop(tripId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Stop>) => addStop(tripId, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId] }),
+  });
+}
+
+export function useUpdateStop(tripId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ stopId, data }: { stopId: string, data: Partial<Stop> }) => updateStop(tripId, stopId, data),
+    onMutate: async ({ stopId, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["trips", tripId] });
+      const prevTrip = queryClient.getQueryData<Trip>(["trips", tripId]);
+      
+      if (prevTrip?.stops) {
+        queryClient.setQueryData<Trip>(["trips", tripId], {
+          ...prevTrip,
+          stops: prevTrip.stops.map(s => s.id === stopId ? { ...s, ...data } : s)
+        });
+      }
+      return { prevTrip };
+    },
+    onError: (err, variables, context) => {
+      if (context?.prevTrip) queryClient.setQueryData(["trips", tripId], context.prevTrip);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId] }),
+  });
+}
+
+export function useDeleteStop(tripId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (stopId: string) => deleteStop(tripId, stopId),
+    onMutate: async (stopId) => {
+      await queryClient.cancelQueries({ queryKey: ["trips", tripId] });
+      const prevTrip = queryClient.getQueryData<Trip>(["trips", tripId]);
+      
+      if (prevTrip?.stops) {
+        queryClient.setQueryData<Trip>(["trips", tripId], {
+          ...prevTrip,
+          stops: prevTrip.stops.filter(s => s.id !== stopId)
+        });
+      }
+      return { prevTrip };
+    },
+    onError: (err, variables, context) => {
+      if (context?.prevTrip) queryClient.setQueryData(["trips", tripId], context.prevTrip);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId] }),
+  });
+}
+
 export function useReorderStops(tripId: string) {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (orderData: { id: string; sortOrder: number }[]) => reorderStops(tripId, orderData),
+    mutationFn: (orderData: { id: string; order_index: number }[]) => reorderStops(tripId, orderData),
     onMutate: async (newOrderData) => {
       await queryClient.cancelQueries({ queryKey: ["trips", tripId] });
+      const prevTrip = queryClient.getQueryData<Trip>(["trips", tripId]);
 
-      const previousTrip = queryClient.getQueryData<Trip>(["trips", tripId]);
-
-      if (previousTrip && previousTrip.stops) {
-        // Optimistically update the order in cache
-        const updatedStops = [...previousTrip.stops];
-        newOrderData.forEach(({ id, sortOrder }) => {
+      if (prevTrip?.stops) {
+        const updatedStops = [...prevTrip.stops];
+        newOrderData.forEach(({ id, order_index }) => {
           const stop = updatedStops.find(s => s.id === id);
-          if (stop) stop.sortOrder = sortOrder;
+          if (stop) stop.orderIndex = order_index;
         });
-        // Re-sort array
-        updatedStops.sort((a, b) => a.sortOrder - b.sortOrder);
+        updatedStops.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 
         queryClient.setQueryData<Trip>(["trips", tripId], {
-          ...previousTrip,
+          ...prevTrip,
           stops: updatedStops,
         });
       }
-
-      return { previousTrip };
+      return { prevTrip };
     },
     onError: (err, variables, context) => {
-      if (context?.previousTrip) {
-        queryClient.setQueryData(["trips", tripId], context.previousTrip);
+      if (context?.prevTrip) queryClient.setQueryData(["trips", tripId], context.prevTrip);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId] }),
+  });
+}
+
+export function useAddActivity(tripId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ stopId, data }: { stopId: string, data: any }) => attachActivity(tripId, stopId, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId] }),
+  });
+}
+
+export function useRemoveActivity(tripId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ stopId, activityId }: { stopId: string, activityId: string }) => removeActivity(tripId, stopId, activityId),
+    onMutate: async ({ stopId, activityId }) => {
+      await queryClient.cancelQueries({ queryKey: ["trips", tripId] });
+      const prevTrip = queryClient.getQueryData<Trip>(["trips", tripId]);
+      
+      if (prevTrip?.stops) {
+        queryClient.setQueryData<Trip>(["trips", tripId], {
+          ...prevTrip,
+          stops: prevTrip.stops.map(s => {
+            if (s.id === stopId && s.activities) {
+              return { ...s, activities: s.activities.filter(a => a.id !== activityId && a.stop_activity_id !== activityId) };
+            }
+            return s;
+          })
+        });
       }
-      // TODO: Show visible error toast here as per requirements
+      return { prevTrip };
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["trips", tripId] });
+    onError: (err, variables, context) => {
+      if (context?.prevTrip) queryClient.setQueryData(["trips", tripId], context.prevTrip);
     },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["trips", tripId] }),
   });
 }

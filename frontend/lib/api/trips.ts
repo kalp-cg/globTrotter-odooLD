@@ -54,16 +54,35 @@ export function addStop(tripId: string, data: Partial<Stop>): Promise<Stop> {
   });
 }
 
-export function reorderStops(tripId: string, orderData: { id: string; sortOrder: number }[]): Promise<void> {
-  // TODO: Verify the bulk reorder path or if it's done stop by stop
+export function reorderStops(tripId: string, orderData: { id: string; order_index: number }[]): Promise<void> {
   return apiClient(`/trips/${tripId}/stops/reorder`, {
     method: "PUT",
-    body: JSON.stringify({ items: orderData }),
+    body: JSON.stringify({ stops: orderData }),
+  });
+}
+
+export function updateStop(tripId: string, stopId: string, data: Partial<Stop>): Promise<Stop> {
+  return apiClient(`/trips/${tripId}/stops/${stopId}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
   });
 }
 
 export function deleteStop(tripId: string, stopId: string): Promise<void> {
   return apiClient(`/trips/${tripId}/stops/${stopId}`, {
+    method: "DELETE",
+  });
+}
+
+export function attachActivity(tripId: string, stopId: string, data: any): Promise<any> {
+  return apiClient(`/trips/${tripId}/stops/${stopId}/activities`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function removeActivity(tripId: string, stopId: string, activityId: string): Promise<void> {
+  return apiClient(`/trips/${tripId}/stops/${stopId}/activities/${activityId}`, {
     method: "DELETE",
   });
 }
