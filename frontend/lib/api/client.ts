@@ -22,7 +22,7 @@ export async function apiClient<T>(
   };
 
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
     if (token) {
       config.headers = {
         ...config.headers,
