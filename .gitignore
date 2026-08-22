@@ -42,3 +42,8 @@ backend/dist/
 *.tsbuildinfo
 next-env.d.ts
 
+# agent configs
+AGENTS.md
+CLAUDE.md
+agents.md
+claude.md
