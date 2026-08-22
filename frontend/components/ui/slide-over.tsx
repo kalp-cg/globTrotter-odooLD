@@ -68,7 +68,7 @@ export function SlideOver({ isOpen, onClose, title, children }: SlideOverProps) 
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-6">
               {children}
             </div>
           </motion.div>

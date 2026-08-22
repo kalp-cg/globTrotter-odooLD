@@ -17,6 +17,27 @@ interface CitySearchProps {
 
 const REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "Middle East"];
 
+const FALLBACK_IMAGES = [
+  "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80", // Paris
+  "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&q=80", // London
+  "https://images.unsplash.com/photo-1496442226666-8d4d0e57f599?w=400&q=80", // NYC
+  "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&q=80", // Tokyo
+  "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=400&q=80", // Sydney
+  "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80", // Dubai
+  "https://images.unsplash.com/photo-1504609774514-a95e791b96a7?w=400&q=80", // San Francisco
+  "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&q=80", // Singapore
+  "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80", // Rome
+  "https://images.unsplash.com/photo-1506159904225-f958448373b5?w=400&q=80", // Kyoto
+];
+
+const getCityFallbackImage = (cityName: string) => {
+  let hash = 0;
+  for (let i = 0; i < cityName.length; i++) {
+    hash = cityName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return FALLBACK_IMAGES[Math.abs(hash) % FALLBACK_IMAGES.length];
+};
+
 export function CitySearch({ onSelectCity, className = "" }: CitySearchProps) {
   const [search, setSearch] = useState("");
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -126,7 +147,7 @@ export function CitySearch({ onSelectCity, className = "" }: CitySearchProps) {
                     {/* Thumbnail */}
                     <div className="w-16 h-16 shrink-0 bg-kraft overflow-hidden rounded-sm border border-ink/20 transform -rotate-2 group-hover:rotate-0 transition-transform">
                       <img 
-                        src={city.imageUrl || "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80"}
+                        src={city.imageUrl || getCityFallbackImage(city.name)}
                         alt={city.name}
                         className="w-full h-full object-cover"
                       />

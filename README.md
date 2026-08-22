@@ -7,6 +7,7 @@
 
 ## 📑 Table of Contents
 - [✨ Key Features & Capabilities](#-key-features--capabilities)
+- [💻 Tech Stack](#-tech-stack)
 - [🏛️ System Architecture](#️-system-architecture)
 - [🗄️ Relational Database Model (ERD)](#️-relational-database-model-erd)
 - [🗺️ Application Route & Screen Directory](#️-application-route--screen-directory)
@@ -71,6 +72,15 @@ mindmap
 ### 5. 🎒 Gear & Packing List Checklist
 - **Tailored Categorization**: Documents, Clothing, Tech & Gear, Toiletries, and Destination Specific essentials.
 - **Live Progress Counter**: Interactive checkable items with real-time percentage fill bar and local persistence.
+
+---
+
+## 💻 Tech Stack
+
+- **Frontend:** Next.js (App Router), React, TypeScript, Tailwind CSS, React Query
+- **Backend:** Node.js, Express, TypeScript
+- **Database:** NeonDB (PostgreSQL)
+- **Authentication:** JWT, bcryptjs
 
 ---
 
