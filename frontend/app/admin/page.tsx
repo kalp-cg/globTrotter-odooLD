@@ -29,11 +29,17 @@ export default function AdminDashboardPage() {
   const [search, setSearch] = useState("");
   const [selectedUserForTrips, setSelectedUserForTrips] = useState<{id: string, name: string} | null>(null);
 
-  const { data: stats, isLoading: statsLoading } = useAdminStats();
-  const { data: trends, isLoading: trendsLoading } = useAdminTrends();
-  const { data: topCities, isLoading: citiesLoading } = useAdminTopCities();
-  const { data: topActivities, isLoading: activitiesLoading } = useAdminTopActivities();
-  const { data: usersData, isLoading: usersLoading } = useAdminUsers();
+  const { data: rawStats, isLoading: statsLoading } = useAdminStats();
+  const { data: rawTrends, isLoading: trendsLoading } = useAdminTrends();
+  const { data: rawTopCities, isLoading: citiesLoading } = useAdminTopCities();
+  const { data: rawTopActivities, isLoading: activitiesLoading } = useAdminTopActivities();
+  const { data: rawUsersData, isLoading: usersLoading } = useAdminUsers();
+
+  const stats: any = rawStats;
+  const trends: any = rawTrends;
+  const topCities: any[] = Array.isArray(rawTopCities) ? rawTopCities : (rawTopCities as any)?.data || [];
+  const topActivities: any[] = Array.isArray(rawTopActivities) ? rawTopActivities : (rawTopActivities as any)?.data || [];
+  const usersData: any[] = Array.isArray(rawUsersData) ? rawUsersData : (rawUsersData as any)?.data || [];
 
   const [expandedCityId, setExpandedCityId] = useState<string | null>(null);
   const [expandedActivityId, setExpandedActivityId] = useState<string | null>(null);
@@ -46,8 +52,8 @@ export default function AdminDashboardPage() {
   const filteredUsers = useMemo(() => {
     if (!usersData) return [];
     return usersData.filter((u: any) => 
-      u.email.toLowerCase().includes(search.toLowerCase()) || 
-      u.name.toLowerCase().includes(search.toLowerCase())
+      (u.email || "").toLowerCase().includes(search.toLowerCase()) || 
+      (u.name || "").toLowerCase().includes(search.toLowerCase())
     );
   }, [usersData, search]);
 
