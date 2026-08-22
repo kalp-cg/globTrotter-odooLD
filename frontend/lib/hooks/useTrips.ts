@@ -1,20 +1,38 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import { getTrips, getTrip, createTrip, updateTrip, deleteTrip, addStop, reorderStops, deleteStop, GetTripsParams } from "../api/trips";
+import { 
+  getTrips, 
+  getTrip, 
+  createTrip, 
+  updateTrip, 
+  deleteTrip, 
+  copyTrip, 
+  addStop, 
+  reorderStops, 
+  updateStop, 
+  deleteStop, 
+  attachActivity, 
+  removeActivity, 
+  GetTripsParams 
+} from "../api/trips";
 import { Trip, Stop } from "../api/types";
 
 export function useTrips(params?: GetTripsParams) {
+  const hasToken = typeof window !== "undefined" ? !!(localStorage.getItem("accessToken") || localStorage.getItem("token")) : false;
   return useQuery({
     queryKey: ["trips", params],
     queryFn: () => getTrips(params),
+    enabled: hasToken,
   });
 }
 
 export function useInfiniteTrips(params?: Omit<GetTripsParams, 'cursor'>) {
+  const hasToken = typeof window !== "undefined" ? !!(localStorage.getItem("accessToken") || localStorage.getItem("token")) : false;
   return useInfiniteQuery({
     queryKey: ["trips", "infinite", params],
     queryFn: ({ pageParam = 0 }) => getTrips({ ...params, cursor: pageParam }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: hasToken,
   });
 }
 
@@ -31,7 +49,7 @@ export function useCreateTrip() {
 
   return useMutation({
     mutationFn: createTrip,
-    onSuccess: (newTrip) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
   });
@@ -41,7 +59,7 @@ export function useUpdateTrip() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateTrip,
+    mutationFn: ({ id, data }: { id: string; data: Partial<Trip> }) => updateTrip(id, data),
     onSuccess: (updatedTrip) => {
       queryClient.setQueryData(["trips", updatedTrip.id], updatedTrip);
       queryClient.invalidateQueries({ queryKey: ["trips"] });
@@ -54,7 +72,7 @@ export function useDeleteTrip() {
 
   return useMutation({
     mutationFn: deleteTrip,
-    onMutate: async (deletedId) => {
+    onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["trips"] });
       const previousTrips = queryClient.getQueryData(["trips"]);
       return { previousTrips };
@@ -72,7 +90,7 @@ export function useCopyTrip() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (tripId: string) => import("../api/trips").then(m => m.copyTrip(tripId)),
+    mutationFn: (tripId: string) => copyTrip(tripId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     }
@@ -145,9 +163,12 @@ export function useReorderStops(tripId: string) {
         const updatedStops = [...prevTrip.stops];
         newOrderData.forEach(({ id, order_index }) => {
           const stop = updatedStops.find(s => s.id === id);
-          if (stop) stop.orderIndex = order_index;
+          if (stop) {
+            stop.orderIndex = order_index;
+            stop.order_index = order_index;
+          }
         });
-        updatedStops.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+        updatedStops.sort((a, b) => ((a.orderIndex ?? a.order_index ?? 0) - (b.orderIndex ?? b.order_index ?? 0)));
 
         queryClient.setQueryData<Trip>(["trips", tripId], {
           ...prevTrip,
@@ -184,7 +205,10 @@ export function useRemoveActivity(tripId: string) {
           ...prevTrip,
           stops: prevTrip.stops.map(s => {
             if (s.id === stopId && s.activities) {
-              return { ...s, activities: s.activities.filter(a => a.id !== activityId && a.stop_activity_id !== activityId) };
+              return { 
+                ...s, 
+                activities: s.activities.filter(a => a.id !== activityId && a.stop_activity_id !== activityId && a.stopActivityId !== activityId && a.activityId !== activityId && a.activity_id !== activityId) 
+              };
             }
             return s;
           })

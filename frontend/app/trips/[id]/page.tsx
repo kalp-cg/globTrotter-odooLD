@@ -66,7 +66,7 @@ export default function ItineraryBuilderPage() {
   );
 
   const selectedStop = useMemo(() => {
-    return trip?.stops?.find(s => s.id === selectedStopId) || null;
+    return trip?.stops?.find((s: any) => s.id === selectedStopId) || null;
   }, [trip, selectedStopId]);
 
   // Sync local dates when stop selection changes
@@ -99,12 +99,12 @@ export default function ItineraryBuilderPage() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id && trip?.stops) {
-      const oldIndex = trip.stops.findIndex((s) => s.id === active.id);
-      const newIndex = trip.stops.findIndex((s) => s.id === over?.id);
+      const oldIndex = trip.stops.findIndex((s: any) => s.id === active.id);
+      const newIndex = trip.stops.findIndex((s: any) => s.id === over?.id);
       
       const newStops = arrayMove(trip.stops, oldIndex, newIndex);
       
-      const orderData = newStops.map((s, index) => ({
+      const orderData = newStops.map((s: any, index: number) => ({
         id: s.id,
         order_index: index + 1
       }));
@@ -127,7 +127,7 @@ export default function ItineraryBuilderPage() {
       departureDate: nextWeek.toISOString(),
       orderIndex: (trip?.stops?.length || 0) + 1
     }, {
-      onSuccess: (newStop) => setSelectedStopId(newStop.id)
+      onSuccess: (newStop: any) => setSelectedStopId(newStop.id)
     });
   };
 
@@ -147,10 +147,10 @@ export default function ItineraryBuilderPage() {
 
   const totalCost = useMemo(() => {
     if (!trip?.stops) return 0;
-    return trip.stops.reduce((acc, stop) => {
-      let stopCost = stop.sectionBudget || 0;
+    return trip.stops.reduce((acc: number, stop: any) => {
+      let stopCost = stop.sectionBudget || stop.section_budget || 0;
       if (stop.activities) {
-        stopCost += stop.activities.reduce((a, act) => a + (act.actualCost || 0), 0);
+        stopCost += stop.activities.reduce((a: number, act: any) => a + (act.actualCost || act.actual_cost || 0), 0);
       }
       return acc + stopCost;
     }, 0);
@@ -197,10 +197,10 @@ export default function ItineraryBuilderPage() {
               onDragEnd={handleDragEnd}
             >
               <SortableContext 
-                items={trip.stops.map(s => s.id)}
+                items={trip.stops.map((s: any) => s.id)}
                 strategy={verticalListSortingStrategy}
               >
-                {trip.stops.sort((a,b) => (a.orderIndex||0) - (b.orderIndex||0)).map((stop, i) => (
+                {[...trip.stops].sort((a: any, b: any) => ((a.orderIndex ?? a.order_index ?? 0) - (b.orderIndex ?? b.order_index ?? 0))).map((stop: any, i: number) => (
                   <SortableStopItem 
                     key={stop.id} 
                     stop={stop} 
@@ -295,7 +295,7 @@ export default function ItineraryBuilderPage() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto space-y-3 pb-20 pr-2">
-                  {selectedStop.activities?.length ? selectedStop.activities.map((act) => (
+                  {selectedStop.activities?.length ? selectedStop.activities.map((act: any) => (
                     <motion.div 
                       key={act.stopActivityId || act.id} 
                       initial={{ opacity: 0, x: 20 }}
