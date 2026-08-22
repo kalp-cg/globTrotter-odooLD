@@ -10,7 +10,7 @@ interface ActivitySearchSlideoverProps {
   cityId: string;
   startDate?: string;
   endDate?: string;
-  onSelectActivity: (activityId: string, cost: number, date: string) => void;
+  onSelectActivity: (activityId: string, cost: number, date: string, activity?: any) => void;
 }
 
 export function ActivitySearchSlideover({ isOpen, onClose, cityId, startDate, endDate, onSelectActivity }: ActivitySearchSlideoverProps) {
