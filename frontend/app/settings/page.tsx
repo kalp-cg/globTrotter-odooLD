@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useAuth, useLogout } from "@/lib/hooks/useAuth";
 import { useUpdateProfile, useDeleteAccount } from "@/lib/hooks/useUsers";
 import { StampButton } from "@/components/ui/stamp-button";
 import { LuggageTag } from "@/components/ui/luggage-tag";
@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const { user, authData, isLoading } = useAuth();
   const updateProfile = useUpdateProfile();
   const deleteAccount = useDeleteAccount();
+  const logout = useLogout();
 
   const savedDestinations = authData?.saved_destinations || [];
 
@@ -192,6 +193,21 @@ export default function SettingsPage() {
             </div>
 
           </div>
+        </div>
+
+        {/* Account Actions */}
+        <div className="w-full mt-12 bg-paper p-6 sm:p-8 border-2 border-dashed border-kraft shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ml-4 relative transform -rotate-1">
+          <div>
+            <h3 className="font-display text-2xl text-ink">Sign Out</h3>
+            <p className="font-body text-ink/70">Ready to pack up for today?</p>
+          </div>
+          <StampButton 
+            onClick={() => logout.mutate()} 
+            disabled={logout.isPending}
+            className="shrink-0 bg-ink text-paper border-ink hover:bg-ink/90"
+          >
+            {logout.isPending ? "Signing out..." : "Log Out"}
+          </StampButton>
         </div>
 
         {/* Danger Zone */}
