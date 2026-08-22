@@ -15,11 +15,12 @@ interface TripManagementCardProps {
 
 export function TripManagementCard({ trip }: TripManagementCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const deleteTrip = useDeleteTrip();
 
-  const stopsCount = trip.stops?.length || 0;
-  const startDate = trip.startDate ? new Date(trip.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : '';
-  const endDate = trip.endDate ? new Date(trip.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : '';
+  const stopsCount = trip.stops?.length || (trip.stops_count as number) || 0;
+  const startDate = (trip.startDate || trip.start_date) ? new Date((trip.startDate || trip.start_date)!).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : '';
+  const endDate = (trip.endDate || trip.end_date) ? new Date((trip.endDate || trip.end_date)!).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : '';
 
   const handleDeleteConfirm = () => {
     deleteTrip.mutate(trip.id);
@@ -36,42 +37,44 @@ export function TripManagementCard({ trip }: TripManagementCardProps) {
             rotateZ: -10, 
             transition: { duration: 0.4, ease: "easeIn" } 
           }}
-          className="relative group w-full max-w-[320px] mx-auto"
+          className="relative group w-full max-w-[320px] mx-auto flex flex-col"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          <PolaroidCard
-            id={trip.id}
-            caption={trip.name}
-            imageUrl={trip.coverPhotoUrl || "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80"}
-            className="w-full"
-          />
-          
-          {/* Tag floating on top */}
+          {/* Tag floating on top-right */}
           <div className="absolute -top-3 -right-3 z-20">
             <LuggageTag 
-              text={`${startDate}${endDate ? ' - ' + endDate : ''} • ${stopsCount} stops`} 
+              text={`${startDate}${endDate ? ' – ' + endDate : ''} • ${stopsCount} stop${stopsCount !== 1 ? 's' : ''}`} 
               className="bg-marigold text-ink shadow-sm"
             />
           </div>
 
-          {/* Normal Actions Overlay (shows on hover mostly, or always at bottom) */}
+          {/* The polaroid card itself — no overlapping elements */}
+          <PolaroidCard
+            id={trip.id}
+            caption={trip.name}
+            imageUrl={trip.coverPhotoUrl || trip.cover_photo_url || "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80"}
+            className="w-full"
+          />
+
+          {/* Action Buttons — BELOW the card, slide up on hover */}
           <AnimatePresence>
             {!isDeleting && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="absolute bottom-4 left-0 right-0 flex justify-center gap-4 z-20"
+              <motion.div
+                key="actions"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : -8 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="flex justify-center mt-2"
               >
-                <div className="bg-paper/90 backdrop-blur-sm px-4 py-2 flex gap-4 rounded-sm border border-kraft shadow-sm">
-                  
+                <div className="bg-paper/95 backdrop-blur-sm px-5 py-2 flex gap-5 border border-kraft shadow-sm rounded-sm">
                   <Link href={`/trips/${trip.id}`} title="View Itinerary" className="text-ink hover:text-marigold transition-colors">
                     <Icons.Compass className="w-5 h-5" />
                   </Link>
-
                   <Link href={`/trips/${trip.id}/edit`} title="Edit Settings" className="text-ink hover:text-postal transition-colors">
                     <Icons.EditPencil className="w-5 h-5" />
                   </Link>
-
                   <button 
                     onClick={() => setIsDeleting(true)}
                     title="Delete Trip" 
@@ -79,13 +82,12 @@ export function TripManagementCard({ trip }: TripManagementCardProps) {
                   >
                     <Icons.Trash className="w-5 h-5" />
                   </button>
-                  
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Delete Confirmation State (Tear off this page?) */}
+          {/* Delete Confirmation Overlay */}
           <AnimatePresence>
             {isDeleting && (
               <motion.div 
@@ -121,3 +123,4 @@ export function TripManagementCard({ trip }: TripManagementCardProps) {
     </AnimatePresence>
   );
 }
+
