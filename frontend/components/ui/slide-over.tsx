@@ -51,7 +51,7 @@ export function SlideOver({ isOpen, onClose, title, children }: SlideOverProps) 
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-full sm:w-[400px] md:w-[450px] bg-paper shadow-2xl z-50 border-l-2 border-kraft flex flex-col"
+            className="fixed top-0 right-0 bottom-0 w-full sm:w-[500px] md:w-[600px] bg-paper shadow-2xl z-50 border-l-2 border-kraft flex flex-col"
             style={{
               clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 1% 95%, 0% 90%, 1% 85%, 0% 80%, 1% 75%, 0% 70%, 1% 65%, 0% 60%, 1% 55%, 0% 50%, 1% 45%, 0% 40%, 1% 35%, 0% 30%, 1% 25%, 0% 20%, 1% 15%, 0% 10%, 1% 5%)"
             }}
