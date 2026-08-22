@@ -54,7 +54,7 @@ export default function CommunityPage() {
   const handleCopyItinerary = (slug: string) => {
     copyTripMutation.mutate(slug, {
       onSuccess: (cloned) => {
-        alert("🎉 Itinerary successfully copied to your scrapbook!");
+        alert("Itinerary successfully copied to your scrapbook!");
         router.push(`/trips/${cloned.id}`);
       },
       onError: (err: any) => {
@@ -190,7 +190,7 @@ export default function CommunityPage() {
                       }`}
                       style={{ borderRadius: '2px' }}
                     >
-                      📷 {img.name}
+                      {img.name}
                     </button>
                   ))}
                 </div>
@@ -272,7 +272,7 @@ export default function CommunityPage() {
 
                       {post.trip_name && (
                         <span className="font-display text-xs text-postal bg-postal/10 border border-postal/30 px-2.5 py-1">
-                          📍 {post.trip_name}
+                          {post.trip_name}
                         </span>
                       )}
                     </div>
