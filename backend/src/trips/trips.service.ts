@@ -6,6 +6,8 @@ import { AppError } from '../common/errors/AppError.js';
 export class TripsService {
   static async getTrips(userId: string, queryParams: any) {
     const { status, search, sortBy = 'start_date', sortOrder = 'ASC' } = queryParams;
+    const limit = parseInt(queryParams.limit) || 20;
+    const offset = parseInt(queryParams.cursor) || 0;
 
     let queryText = `
       SELECT 
@@ -50,10 +52,21 @@ export class TripsService {
 
     const validSortCol = sortBy === 'created_at' ? 'created_at' : 'start_date';
     const validSortOrder = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-    queryText += ` ORDER BY t.${validSortCol} ${validSortOrder}`;
+    queryText += ` ORDER BY t.${validSortCol} ${validSortOrder}, t.id ASC`;
+
+    // Fetch limit + 1 to determine if there's a next page
+    queryText += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit + 1, offset);
 
     const res = await query(queryText, params);
-    return res.rows;
+    
+    const hasNextPage = res.rows.length > limit;
+    const data = hasNextPage ? res.rows.slice(0, limit) : res.rows;
+
+    return {
+      data,
+      nextCursor: hasNextPage ? offset + limit : null
+    };
   }
 
   static async createTrip(userId: string, body: any) {

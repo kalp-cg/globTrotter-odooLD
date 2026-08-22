@@ -16,7 +16,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useAuth();
   
-  const { data: trips, isLoading: isTripsLoading } = useTrips();
+  const { data: tripsPayload, isLoading: isTripsLoading } = useTrips();
+  const trips = tripsPayload?.data;
   // Fetch popular cities (mocking the sort param for the API)
   const { data: cities, isLoading: isCitiesLoading } = useCities({ sort: "popular", limit: "5" });
 

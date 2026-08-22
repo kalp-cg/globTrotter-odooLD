@@ -1,11 +1,20 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTrips, getTrip, createTrip, updateTrip, deleteTrip, addStop, reorderStops, deleteStop } from "../api/trips";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { getTrips, getTrip, createTrip, updateTrip, deleteTrip, addStop, reorderStops, deleteStop, GetTripsParams } from "../api/trips";
 import { Trip, Stop } from "../api/types";
 
-export function useTrips() {
+export function useTrips(params?: GetTripsParams) {
   return useQuery({
-    queryKey: ["trips"],
-    queryFn: getTrips,
+    queryKey: ["trips", params],
+    queryFn: () => getTrips(params),
+  });
+}
+
+export function useInfiniteTrips(params?: Omit<GetTripsParams, 'cursor'>) {
+  return useInfiniteQuery({
+    queryKey: ["trips", "infinite", params],
+    queryFn: ({ pageParam = 0 }) => getTrips({ ...params, cursor: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 }
 
@@ -25,6 +34,39 @@ export function useCreateTrip() {
     onSuccess: (newTrip) => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
+  });
+}
+
+export function useUpdateTrip() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateTrip,
+    onSuccess: (updatedTrip) => {
+      queryClient.setQueryData(["trips", updatedTrip.id], updatedTrip);
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+    },
+  });
+}
+
+export function useDeleteTrip() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteTrip,
+    onMutate: async (deletedId) => {
+      // Optimistic update
+      await queryClient.cancelQueries({ queryKey: ["trips"] });
+      
+      const previousTrips = queryClient.getQueryData(["trips"]);
+      
+      // We don't perfectly mock infinite query invalidation here since it's complex,
+      // but we force a refetch on success. We can just rely on the UI hiding it first.
+      return { previousTrips };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+    }
   });
 }
 

@@ -3,8 +3,23 @@ import { Trip, Stop, TripActivity } from "./types";
 
 // TODO: Verify these route paths map to the real backend
 
-export function getTrips(): Promise<Trip[]> {
-  return apiClient("/trips");
+export interface GetTripsParams {
+  cursor?: number;
+  limit?: number;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  search?: string;
+}
+
+export function getTrips(params?: GetTripsParams): Promise<{ data: Trip[]; nextCursor: number | null }> {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") searchParams.append(key, value.toString());
+    });
+  }
+  return apiClient(`/trips?${searchParams.toString()}`);
 }
 
 export function getTrip(id: string): Promise<Trip> {
