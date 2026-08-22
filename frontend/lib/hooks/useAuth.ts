@@ -10,8 +10,12 @@ export function useAuth() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const rawData: any = query.data;
+  const user = rawData?.user ? rawData.user : rawData;
+
   return {
-    user: query.data,
+    user,
+    authData: rawData,
     isLoading: query.isLoading,
     error: query.error,
     isAuthenticated: !!query.data,
@@ -26,7 +30,7 @@ export function useLogin() {
     mutationFn: login,
     onSuccess: (data: any) => {
       if (data.accessToken) localStorage.setItem("accessToken", data.accessToken);
-      queryClient.setQueryData(["auth", "me"], data.user);
+      queryClient.setQueryData(["auth", "me"], data);
       router.push("/");
     },
   });
@@ -40,7 +44,7 @@ export function useSignup() {
     mutationFn: signup,
     onSuccess: (data: any) => {
       if (data.accessToken) localStorage.setItem("accessToken", data.accessToken);
-      queryClient.setQueryData(["auth", "me"], data.user);
+      queryClient.setQueryData(["auth", "me"], data);
       router.push("/");
     },
   });

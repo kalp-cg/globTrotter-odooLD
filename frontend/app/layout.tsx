@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${kalam.variable} ${lora.variable} ${courier.variable}`} suppressHydrationWarning>
-      <body className="antialiased selection:bg-marigold selection:text-ink">
+      <body className="antialiased selection:bg-marigold selection:text-ink" suppressHydrationWarning>
         <Providers>
           <Navbar />
           <AuthGuard>{children}</AuthGuard>
