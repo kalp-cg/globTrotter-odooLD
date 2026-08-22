@@ -22,8 +22,12 @@ export function getTrips(params?: GetTripsParams): Promise<{ data: Trip[]; nextC
   return apiClient(`/trips?${searchParams.toString()}`);
 }
 
-export function getTrip(id: string): Promise<Trip> {
-  return apiClient(`/trips/${id}`);
+export async function getTrip(id: string): Promise<any> {
+  const data = await apiClient<any>(`/trips/${id}`);
+  if (data && data.trip) {
+    return { ...data.trip, stops: data.stops, budget: data.budget };
+  }
+  return data;
 }
 
 export function createTrip(data: Partial<Trip>): Promise<Trip> {
@@ -43,6 +47,12 @@ export function updateTrip(id: string, data: Partial<Trip>): Promise<Trip> {
 export function deleteTrip(id: string): Promise<void> {
   return apiClient(`/trips/${id}`, {
     method: "DELETE",
+  });
+}
+
+export function copyTrip(id: string): Promise<Trip> {
+  return apiClient(`/trips/${id}/copy`, {
+    method: "POST",
   });
 }
 

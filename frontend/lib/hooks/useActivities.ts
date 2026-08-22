@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivities, getActivity } from "../api/activities";
 
-export function useActivities(cityId?: string) {
+export function useActivities(params?: Record<string, string | number>) {
   return useQuery({
-    queryKey: ["activities", { cityId }],
-    queryFn: () => getActivities(cityId),
+    queryKey: ["activities", params],
+    queryFn: ({ signal }) => getActivities(params, { signal }),
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 }

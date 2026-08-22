@@ -59,6 +59,20 @@ export function useDeleteTrip() {
       const previousTrips = queryClient.getQueryData(["trips"]);
       return { previousTrips };
     },
+    onError: (err, deletedId, context) => {
+      queryClient.setQueryData(["trips"], context?.previousTrips);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+    },
+  });
+}
+
+export function useCopyTrip() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (tripId: string) => import("../api/trips").then(m => m.copyTrip(tripId)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     }
