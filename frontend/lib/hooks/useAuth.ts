@@ -5,8 +5,22 @@ import { useRouter } from "next/navigation";
 export function useAuth() {
   const query = useQuery({
     queryKey: ["auth", "me"],
-    queryFn: getMe,
-    retry: false, // Don't retry if unauthenticated
+    queryFn: async () => {
+      if (typeof window === "undefined") return null;
+      const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+      if (!token) return null;
+      try {
+        return await getMe();
+      } catch (err: any) {
+        if (err?.status === 401 || err?.status === 403) {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("token");
+          return null;
+        }
+        return null;
+      }
+    },
+    retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -14,11 +28,11 @@ export function useAuth() {
   const user = rawData?.user ? rawData.user : rawData;
 
   return {
-    user,
+    user: user || null,
     authData: rawData,
     isLoading: query.isLoading,
     error: query.error,
-    isAuthenticated: !!query.data,
+    isAuthenticated: !!user,
   };
 }
 
@@ -58,9 +72,10 @@ export function useLogout() {
     mutationFn: logout,
     onSuccess: () => {
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("token");
       queryClient.setQueryData(["auth", "me"], null);
-      queryClient.clear(); // Clear all cached data
-      router.push("/login");
+      queryClient.clear();
+      router.push("/");
     },
   });
 }

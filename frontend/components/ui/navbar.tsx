@@ -35,6 +35,9 @@ export function Navbar() {
               <Link href="/cities" className={`font-display text-lg hover:text-postal transition-colors ${pathname.startsWith('/cities') ? 'text-postal border-b-2 border-postal' : 'text-ink/70'}`}>
                 Explore
               </Link>
+              <Link href="/community" className={`font-display text-lg hover:text-postal transition-colors ${pathname.startsWith('/community') ? 'text-postal border-b-2 border-postal' : 'text-ink/70'}`}>
+                Community
+              </Link>
               {user.is_admin && (
                 <Link href="/admin" className={`font-display text-lg hover:text-postal transition-colors ${pathname.startsWith('/admin') ? 'text-postal border-b-2 border-postal' : 'text-ink/70'}`}>
                   Admin HQ

@@ -4,7 +4,24 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-const publicRoutes = ["/login", "/signup", "/forgot-password", "/dev/components"];
+// Routes that do NOT require authentication
+const isPublicRoute = (path: string) => {
+  if (
+    path === "/" ||
+    path === "/login" ||
+    path === "/signup" ||
+    path === "/forgot-password" ||
+    path === "/cities" ||
+    path === "/community" ||
+    path === "/terms" ||
+    path === "/privacy" ||
+    path === "/dev/components" ||
+    path.startsWith("/trip/")
+  ) {
+    return true;
+  }
+  return false;
+};
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -12,22 +29,24 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !publicRoutes.includes(pathname)) {
+    if (!isLoading && !isAuthenticated && !isPublicRoute(pathname)) {
       router.push("/login");
     }
   }, [isAuthenticated, isLoading, pathname, router]);
 
-  // Optionally render a skeleton or paper texture block while checking auth
+  // Render a subtle paper skeleton while checking auth status
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="bg-kraft w-64 h-32 animate-pulse rounded-sm" />
+      <div className="flex min-h-screen items-center justify-center bg-paper">
+        <div className="bg-kraft/40 w-48 h-24 border-2 border-dashed border-kraft animate-pulse rounded-sm flex items-center justify-center font-display text-lg text-ink/40">
+          Loading journal...
+        </div>
       </div>
     );
   }
 
-  // If unauthenticated and on a protected route, we render nothing until redirect happens
-  if (!isAuthenticated && !publicRoutes.includes(pathname)) {
+  // If unauthenticated and on a protected route, render nothing until redirect happens
+  if (!isAuthenticated && !isPublicRoute(pathname)) {
     return null;
   }
 
