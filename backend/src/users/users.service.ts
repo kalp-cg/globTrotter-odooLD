@@ -19,9 +19,18 @@ export class UsersService {
       FROM trips WHERE user_id = $1
     `, [userId]);
 
+    const savedCitiesRes = await query(`
+      SELECT c.id, c.name, c.country, c.region, c.image_url, c.cost_index, c.popularity_score
+      FROM user_saved_cities usc
+      JOIN cities c ON usc.city_id = c.id
+      WHERE usc.user_id = $1
+      ORDER BY usc.created_at DESC
+    `, [userId]);
+
     return {
       user: res.rows[0],
-      stats: statsRes.rows[0]
+      stats: statsRes.rows[0],
+      saved_destinations: savedCitiesRes.rows
     };
   }
 

@@ -9,9 +9,11 @@ const router = Router();
 
 router.get('/', requireAuth, TripsController.getTrips);
 router.post('/', requireAuth, TripsController.createTrip);
+router.get('/public/:slug', TripsController.getPublicTripBySlug);
 router.get('/:tripId', TripsController.getTripById);
 router.put('/:tripId', requireAuth, TripsController.updateTrip);
 router.delete('/:tripId', requireAuth, TripsController.deleteTrip);
+router.post('/:tripId/copy', requireAuth, TripsController.copyTrip);
 
 // Sub-routes under /api/trips/:tripId/...
 router.use('/:tripId/stops', itineraryRoutes);

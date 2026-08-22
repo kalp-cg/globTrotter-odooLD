@@ -189,4 +189,57 @@ export class TripsService {
     await query(`DELETE FROM trips WHERE id = $1`, [tripId]);
     return true;
   }
+
+  static async getPublicTripBySlug(slug: string) {
+    const tripRes = await query(`SELECT id FROM trips WHERE public_slug = $1 AND is_public = true LIMIT 1`, [slug]);
+    if (tripRes.rows.length === 0) throw new AppError('This trip isn\'t public (anymore)', 404);
+    
+    return await this.getTripById(tripRes.rows[0].id);
+  }
+
+  static async copyTrip(tripId: string, newUserId: string) {
+    // 1. Fetch original using our own getTripById (this ensures we fetch all stops and activities properly)
+    // Note: We bypass auth here because if they can trigger copy, we assume they have the ID. 
+    // Wait, we should only copy if the trip is public or they are the owner!
+    const tripCheck = await query(`SELECT user_id, is_public FROM trips WHERE id = $1 LIMIT 1`, [tripId]);
+    if (tripCheck.rows.length === 0) throw new AppError('Trip not found', 404);
+    
+    const orig = tripCheck.rows[0];
+    if (!orig.is_public && orig.user_id !== newUserId) {
+      throw new AppError('Forbidden: Cannot copy private trip', 403);
+    }
+
+    const { trip, stops } = await this.getTripById(tripId);
+    
+    const newTripId = uuidv4();
+    const newSlug = trip.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
+    
+    await query(`
+      INSERT INTO trips (id, user_id, name, description, cover_photo_url, start_date, end_date, is_public, public_slug, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, false, $8, CURRENT_TIMESTAMP)
+    `, [newTripId, newUserId, `${trip.name} (Copy)`, trip.description, trip.cover_photo_url, trip.start_date, trip.end_date, newSlug]);
+
+    for (const stop of stops) {
+      const newStopId = uuidv4();
+      await query(`
+        INSERT INTO stops (id, trip_id, city_id, title, notes, arrival_date, departure_date, section_budget, order_index)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [newStopId, newTripId, stop.city_id, stop.title, stop.notes, stop.arrival_date, stop.departure_date, stop.section_budget, stop.order_index]);
+
+      if (stop.activities && stop.activities.length > 0) {
+        for (const act of stop.activities) {
+          const newActId = uuidv4();
+          await query(`
+            INSERT INTO stop_activities (id, stop_id, activity_id, scheduled_date, scheduled_time, actual_cost)
+            VALUES ($1, $2, $3, $4, $5, $6)
+          `, [newActId, newStopId, act.activity_id, act.scheduled_date, act.scheduled_time, act.actual_cost]);
+        }
+      }
+    }
+
+    await BudgetService.recalculateTripBudget(newTripId);
+    
+    const created = await query(`SELECT * FROM trips WHERE id = $1 LIMIT 1`, [newTripId]);
+    return created.rows[0];
+  }
 }

@@ -22,6 +22,15 @@ export class TripsController {
     }
   }
 
+  static async getPublicTripBySlug(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const data = await TripsService.getPublicTripBySlug(req.params.slug as string);
+      return sendSuccess(res, data);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async getTripById(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const data = await TripsService.getTripById(req.params.tripId as string, req.user);
@@ -49,6 +58,15 @@ export class TripsController {
     try {
       await TripsService.deleteTrip(req.params.tripId as string, req.user!.userId, req.user!.isAdmin);
       return sendSuccess(res, null, 'Trip deleted successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async copyTrip(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const data = await TripsService.copyTrip(req.params.tripId as string, req.user!.userId);
+      return sendSuccess(res, data, 'Trip copied successfully', 201);
     } catch (err) {
       next(err);
     }
