@@ -13,6 +13,7 @@ export interface DayCostBreakdown {
   activityCost: number;
   totalCost: number;
   stopNames: string[];
+  stopIds: string[];
 }
 
 export interface TripBudgetAnalysis {
@@ -118,19 +119,43 @@ export function selectCostByDay(trip: Trip | undefined | null): DayCostBreakdown
     trip.stops.forEach((stop: Stop) => {
       if (stop.activities) {
         stop.activities.forEach((act: TripActivity) => {
-          const rawDate = act.scheduledDate || (act as any).scheduled_date || stop.arrivalDate || (stop as any).arrival_date;
+          // Prefer explicit scheduled_date, fall back to stop's arrival_date
+          const rawDate =
+            act.scheduledDate ||
+            (act as any).scheduled_date ||
+            stop.arrivalDate ||
+            (stop as any).arrival_date;
           if (rawDate) {
             const dateKey = new Date(rawDate).toISOString().split("T")[0];
             if (!activityMapByDate[dateKey]) activityMapByDate[dateKey] = [];
             activityMapByDate[dateKey].push({
               ...act,
-              activityName: act.activityName || (act as any).activity_name || act.activity?.name || "Activity",
+              activityName:
+                act.activityName ||
+                (act as any).activity_name ||
+                (act as any).name ||
+                act.activity?.name ||
+                "Activity",
+              category:
+                act.category ||
+                (act as any).activity?.category ||
+                "Sightseeing",
+              description:
+                act.description ||
+                (act as any).activity?.description ||
+                "",
+              imageUrl:
+                act.imageUrl ||
+                (act as any).image_url ||
+                (act as any).activity?.image_url ||
+                "",
             });
           }
         });
       }
     });
   }
+
 
   let curr = new Date(start);
   let dayNum = 1;
@@ -168,6 +193,7 @@ export function selectCostByDay(trip: Trip | undefined | null): DayCostBreakdown
       activityCost: actCost,
       totalCost: actCost + (stopBudgetShare > 0 ? Math.round(stopBudgetShare / 7) : 0),
       stopNames: activeStops.map(s => s.title || s.cityName || (s as any).city_name || "Stop"),
+      stopIds: activeStops.map(s => s.id),
     });
 
     curr.setDate(curr.getDate() + 1);
