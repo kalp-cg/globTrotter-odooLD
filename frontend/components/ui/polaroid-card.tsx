@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import Image from "next/image";
+import { getImageByCityName } from "@/lib/constants/images";
 
 interface PolaroidCardProps {
   id: string; // Used to seed the rotation deterministically
@@ -23,12 +23,14 @@ function hashString(str: string) {
 
 export function PolaroidCard({ id, imageUrl, caption, className = "" }: PolaroidCardProps) {
   const rotation = useMemo(() => {
-    const hash = Math.abs(hashString(id));
+    const hash = Math.abs(hashString(id || caption));
     return (hash % 6) - 3; // Value between -3 and 3
-  }, [id]);
+  }, [id, caption]);
 
   // Jittered polygon for the photo edge
   const photoClipPath = "polygon(2% 1%, 98% 3%, 99% 98%, 1% 99%)";
+
+  const resolvedImage = imageUrl || getImageByCityName(caption);
 
   return (
     <div 
@@ -36,7 +38,7 @@ export function PolaroidCard({ id, imageUrl, caption, className = "" }: Polaroid
       style={{ 
         transform: `rotate(${rotation}deg)`,
         clipPath: "polygon(0% 1%, 100% 0%, 99% 100%, 1% 99%)",
-        boxShadow: "0 0 0 1px rgba(0,0,0,0.05)" // extremely subtle outline, not a drop shadow blur
+        boxShadow: "0 0 0 1px rgba(0,0,0,0.05)"
       }}
     >
       {/* Offset paper shadow layer using pseudo-element trick */}
@@ -58,19 +60,14 @@ export function PolaroidCard({ id, imageUrl, caption, className = "" }: Polaroid
         className="relative w-full aspect-[4/3] bg-kraft/30 mb-4 overflow-hidden"
         style={{ clipPath: photoClipPath }}
       >
-        {imageUrl ? (
-          <Image 
-            src={imageUrl} 
-            alt={caption}
-            fill
-            className="object-cover grayscale-[15%] contrast-125 sepia-[10%]"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-ink/30 font-display">
-            No Photo
-          </div>
-        )}
+        <img 
+          src={resolvedImage} 
+          alt={caption}
+          className="w-full h-full object-cover grayscale-[15%] contrast-125 sepia-[10%]"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = getImageByCityName(caption);
+          }}
+        />
       </div>
 
       <div className="text-center font-display text-xl text-ink px-2 leading-tight">

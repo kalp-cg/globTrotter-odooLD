@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 
-interface StampButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface StampButtonProps extends HTMLMotionProps<"button"> {
   variant?: "primary" | "secondary";
   children: React.ReactNode;
 }
