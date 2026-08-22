@@ -98,14 +98,22 @@ export async function initDatabase() {
     );
 
     CREATE TABLE IF NOT EXISTS activities (
-      id UUID PRIMARY KEY,
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       city_id UUID REFERENCES cities(id) ON DELETE CASCADE,
       name VARCHAR(255) NOT NULL,
-      category VARCHAR(100) NOT NULL,
+      category VARCHAR(50) NOT NULL,
       description TEXT,
-      image_url VARCHAR(500),
-      est_cost DECIMAL(10, 2) DEFAULT 0.00,
-      est_duration_mins INTEGER DEFAULT 60
+      image_url TEXT,
+      est_cost DECIMAL(10,2),
+      est_duration_mins INTEGER,
+      popularity_score INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS user_saved_cities (
+      user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+      city_id UUID REFERENCES cities(id) ON DELETE CASCADE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (user_id, city_id)
     );
 
     CREATE TABLE IF NOT EXISTS stop_activities (
@@ -168,6 +176,7 @@ async function seedData() {
       ($1, 'Alex Rivera (Admin)', 'admin@globtrotter.com', $2, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80', 'English', true, '+1 (555) 019-2834', 'San Francisco', 'United States', 'Platform Curator & Travel Strategist.'),
       ($3, 'Sophie Laurent', 'traveler@globtrotter.com', $4, 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80', 'English', false, '+33 6 12 34 56 78', 'Paris', 'France', 'Photographer, coffee enthusiast and weekend wanderer.'),
       ($5, 'Kenji Takahashi', 'kenji@globtrotter.com', $6, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80', 'English', false, '+81 90 1234 5678', 'Tokyo', 'Japan', 'Architect exploring ancient and modern urban wonders.')
+    ON CONFLICT (id) DO NOTHING;
   `, [adminId, hashAdmin, travelerId, hashTraveler, demoUserId, hashTraveler]);
 
   // 2. Seed Curated Cities
@@ -183,7 +192,12 @@ async function seedData() {
     { id: 'c1010101-0000-0000-0000-000000000009', name: 'Sydney', country: 'Australia', region: 'Oceania', cost_index: 3.9, popularity_score: 9.1, image_url: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800&auto=format&fit=crop&q=80', description: 'Sun-kissed harbor metropolis boasting the iconic Opera House, Bondi Beach, and coastal walks.' },
     { id: 'c1010101-0000-0000-0000-000000000010', name: 'Rio de Janeiro', country: 'Brazil', region: 'South America', cost_index: 2.2, popularity_score: 9.0, image_url: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&auto=format&fit=crop&q=80', description: 'Famed for Copacabana and Ipanema beaches, Christ the Redeemer, and vibrant Samba culture.' },
     { id: 'c1010101-0000-0000-0000-000000000011', name: 'Dubai', country: 'United Arab Emirates', region: 'Middle East', cost_index: 4.2, popularity_score: 9.2, image_url: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&auto=format&fit=crop&q=80', description: 'Futuristic oasis of luxury shopping, ultramodern architecture, and lively nightlife scene.' },
-    { id: 'c1010101-0000-0000-0000-000000000012', name: 'London', country: 'United Kingdom', region: 'Europe', cost_index: 4.1, popularity_score: 9.7, image_url: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&auto=format&fit=crop&q=80', description: 'Dynamic global capital rich in royal history, West End theatre, grand museums, and iconic red buses.' }
+    { id: 'c1010101-0000-0000-0000-000000000012', name: 'London', country: 'United Kingdom', region: 'Europe', cost_index: 4.1, popularity_score: 9.7, image_url: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&auto=format&fit=crop&q=80', description: 'Dynamic global capital rich in royal history, West End theatre, grand museums, and iconic red buses.' },
+    { id: 'c1010101-0000-0000-0000-000000000013', name: 'Ahmedabad', country: 'India', region: 'South Asia', cost_index: 1.2, popularity_score: 8.5, image_url: 'https://images.unsplash.com/photo-1620857507365-2bc7eb9b9e59?w=800&auto=format&fit=crop&q=80', description: 'A bustling city known for its cotton textiles, diamond cutting, and incredible Gujarati street food.' },
+    { id: 'c1010101-0000-0000-0000-000000000014', name: 'Mumbai', country: 'India', region: 'South Asia', cost_index: 2.0, popularity_score: 9.2, image_url: 'https://images.unsplash.com/photo-1522262590532-a991489a0253?w=800&auto=format&fit=crop&q=80', description: 'The City of Dreams. India’s financial center and home to the Bollywood film industry.' },
+    { id: 'c1010101-0000-0000-0000-000000000015', name: 'Jaipur', country: 'India', region: 'South Asia', cost_index: 1.5, popularity_score: 9.0, image_url: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&auto=format&fit=crop&q=80', description: 'The Pink City of India, known for its royal palaces, vibrant markets, and historic forts.' },
+    { id: 'c1010101-0000-0000-0000-000000000016', name: 'Varanasi', country: 'India', region: 'South Asia', cost_index: 1.0, popularity_score: 8.8, image_url: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop&q=80', description: 'One of the world’s oldest continually inhabited cities, the spiritual capital of India.' },
+    { id: 'c1010101-0000-0000-0000-000000000017', name: 'Kochi', country: 'India', region: 'South Asia', cost_index: 1.4, popularity_score: 8.7, image_url: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&auto=format&fit=crop&q=80', description: 'A vibrant city in Kerala known for its Chinese fishing nets and beautiful backwaters.' }
   ];
 
   for (const c of cities) {
@@ -239,8 +253,20 @@ async function seedData() {
     // Rio de Janeiro
     { id: 'a1010101-0000-0000-0010-000000000001', city_id: cities[9].id, name: 'Christ the Redeemer & Sugarloaf Cable Car', category: 'Sightseeing', description: 'Panoramic aerial views of Rio bays and the iconic art deco Christ statue.', image_url: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=600&auto=format&fit=crop&q=80', est_cost: 48.00, est_duration_mins: 240 },
 
+    // Indian Cities
+    { id: 'a1010101-0000-0000-0013-000000000001', city_id: 'c1010101-0000-0000-0000-000000000013', name: 'Sabarmati Ashram Visit', category: 'Culture & Art', description: 'Explore the historic residence of Mahatma Gandhi along the Sabarmati river.', image_url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f7415e?w=600&auto=format&fit=crop&q=80', est_cost: 0, est_duration_mins: 120 },
+    { id: 'a1010101-0000-0000-0013-000000000002', city_id: 'c1010101-0000-0000-0000-000000000013', name: 'Manek Chowk Street Food', category: 'Food & Dining', description: 'Taste incredible local street food at the bustling night market.', image_url: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=600&auto=format&fit=crop&q=80', est_cost: 15.00, est_duration_mins: 120 },
+    
+    { id: 'a1010101-0000-0000-0014-000000000001', city_id: 'c1010101-0000-0000-0000-000000000014', name: 'Gateway of India Walk', category: 'Sightseeing', description: 'Stroll around the iconic Gateway of India and explore Colaba.', image_url: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&auto=format&fit=crop&q=80', est_cost: 0, est_duration_mins: 90 },
+    { id: 'a1010101-0000-0000-0014-000000000002', city_id: 'c1010101-0000-0000-0000-000000000014', name: 'Marine Drive Sunset', category: 'Relaxation', description: 'Enjoy a peaceful evening walk along the Queen’s Necklace.', image_url: 'https://images.unsplash.com/photo-1522262590532-a991489a0253?w=600&auto=format&fit=crop&q=80', est_cost: 0, est_duration_mins: 120 },
+
+    { id: 'a1010101-0000-0000-0015-000000000001', city_id: 'c1010101-0000-0000-0000-000000000015', name: 'Amer Fort Tour', category: 'Culture & Art', description: 'Explore the majestic Amer Fort on a guided tour.', image_url: 'https://images.unsplash.com/photo-1599661559882-7e7161b36585?w=600&auto=format&fit=crop&q=80', est_cost: 25.00, est_duration_mins: 180 },
+    
+    { id: 'a1010101-0000-0000-0016-000000000001', city_id: 'c1010101-0000-0000-0000-000000000016', name: 'Ganges Boat Ride at Sunrise', category: 'Culture & Art', description: 'Witness the spiritual morning rituals along the ghats from a boat.', image_url: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=600&auto=format&fit=crop&q=80', est_cost: 20.00, est_duration_mins: 90 },
+    
+    { id: 'a1010101-0000-0000-0017-000000000001', city_id: 'c1010101-0000-0000-0000-000000000017', name: 'Kerala Backwaters Cruise', category: 'Adventure', description: 'Relax on a traditional houseboat cruising the serene backwaters.', image_url: 'https://images.unsplash.com/photo-1593693397690-362cb9666c6b?w=600&auto=format&fit=crop&q=80', est_cost: 60.00, est_duration_mins: 240 },
+    
     // Dubai
-    { id: 'a1010101-0000-0000-0000-000000000011', city_id: cities[10].id, name: 'Burj Khalifa At the Top & Desert Safari', category: 'Adventure', description: 'Observation lounge on the 148th floor followed by sunset dune bashing and BBQ.', image_url: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&auto=format&fit=crop&q=80', est_cost: 85.00, est_duration_mins: 360 },
 
     // London
     { id: 'a1010101-0000-0000-0000-000000000012', city_id: cities[11].id, name: 'Tower of London & Crown Jewels Tour', category: 'Culture & Art', description: 'Discover 1,000 years of royal intrigue and ceremonial gems with a Beefeater guide.', image_url: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&auto=format&fit=crop&q=80', est_cost: 38.00, est_duration_mins: 120 }
@@ -265,6 +291,7 @@ async function seedData() {
       ($1, $2, 'European Grand Odyssey', 'Exploring historical architecture, art treasures, and fine cuisine across Paris, Rome, and Barcelona.', 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1000&auto=format&fit=crop&q=80', '2026-09-10', '2026-09-24', true, 'euro-odyssey-2026', CURRENT_TIMESTAMP),
       ($3, $4, 'Japan Sakura & Heritage Quest', 'From the cybernetic lights of Tokyo to the tranquil temple pathways of Kyoto.', 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1000&auto=format&fit=crop&q=80', '2026-10-05', '2026-10-18', true, 'japan-quest-2026', CURRENT_TIMESTAMP),
       ($5, $6, 'NYC Fast-Paced Getaway', 'A high-energy metropolitan tour of Broadway shows, rooftop skyline lounges, and museum walks.', 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1000&auto=format&fit=crop&q=80', '2026-06-01', '2026-06-07', false, 'nyc-getaway-2026', CURRENT_TIMESTAMP)
+    ON CONFLICT (id) DO NOTHING;
   `, [trip1Id, travelerId, trip2Id, travelerId, trip3Id, adminId]);
 
   // 5. Seed Trip Stops (Sections)
@@ -281,7 +308,8 @@ async function seedData() {
       ($4, $5, $6, 'Section 2: Rome Ancient Wonders', 'Colosseum tour booked in morning. Trastevere food walk at dusk.', '2026-09-15', '2026-09-20', 1100.00, 2),
       ($7, $8, $9, 'Section 3: Barcelona Coastal & Gaudí', 'Relax on the beach and discover Gothic Quarter alleys.', '2026-09-20', '2026-09-24', 950.00, 3),
       ($10, $11, $12, 'Section 1: Tokyo Cyber & Culinary', 'Shinjuku base. teamLab immersion and Shibuya food exploration.', '2026-10-05', '2026-10-12', 1500.00, 1),
-      ($13, $14, $15, 'Section 2: Kyoto Zen Gardens', 'Morning Fushimi Inari hike and afternoon matcha ceremony.', '2026-10-12', '2026-10-18', 1300.00, 2)
+      ($13, $14, $15, 'Section 2: Kyoto Zen Retreat', 'Ryokan stay in Gion. Matcha ceremonies and shrine hikes.', '2026-10-12', '2026-10-18', 1200.00, 2)
+    ON CONFLICT (id) DO NOTHING;
   `, [
     stop1Id, trip1Id, cities[0].id,
     stop2Id, trip1Id, cities[2].id,
@@ -309,6 +337,7 @@ async function seedData() {
     await query(`
       INSERT INTO stop_activities (id, stop_id, activity_id, scheduled_date, scheduled_time, actual_cost)
       VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (id) DO NOTHING;
     `, s);
   }
 
@@ -319,6 +348,7 @@ async function seedData() {
       ($1, $2, 650.00, 1400.00, 338.00, 750.00, 3138.00, CURRENT_TIMESTAMP),
       ($3, $4, 850.00, 1200.00, 150.00, 600.00, 2800.00, CURRENT_TIMESTAMP),
       ($5, $6, 300.00, 900.00, 192.00, 450.00, 1842.00, CURRENT_TIMESTAMP)
+    ON CONFLICT (id) DO NOTHING;
   `, [uuidv4(), trip1Id, uuidv4(), trip2Id, uuidv4(), trip3Id]);
 
   // 8. Seed Community Posts
