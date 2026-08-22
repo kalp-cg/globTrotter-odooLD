@@ -20,4 +20,13 @@ export class CitiesController {
       next(err);
     }
   }
+
+  static async ensureCity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await CitiesService.ensureCity(req.body);
+      return sendSuccess(res, data, 201);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
