@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${kalam.variable} ${lora.variable} ${courier.variable}`}>
+    <html lang="en" className={`${kalam.variable} ${lora.variable} ${courier.variable}`} suppressHydrationWarning>
       <body className="antialiased selection:bg-marigold selection:text-ink">
         <Providers>
           <AuthGuard>{children}</AuthGuard>
