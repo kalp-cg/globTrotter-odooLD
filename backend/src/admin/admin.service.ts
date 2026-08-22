@@ -22,7 +22,7 @@ export class AdminService {
   static async getTopCities() {
     const res = await query(`
       SELECT 
-        c.id, c.name, c.country, c.region, c.cost_index, c.popularity_score, c.image_url,
+        c.id, c.name, c.country, c.region, c.cost_index, c.popularity_score, c.image_url, c.description,
         COUNT(s.id) AS stops_added_count
       FROM cities c
       LEFT JOIN stops s ON c.id = s.city_id
@@ -36,7 +36,7 @@ export class AdminService {
   static async getTopActivities() {
     const res = await query(`
       SELECT 
-        a.id, a.name, a.category, a.est_cost, a.image_url,
+        a.id, a.name, a.category, a.est_cost, a.image_url, a.description,
         c.name AS city_name, c.country AS city_country,
         COUNT(sa.id) AS booking_count
       FROM activities a
@@ -74,10 +74,20 @@ export class AdminService {
       GROUP BY trip_status;
     `);
 
+    const timeSeriesRes = await query(`
+      SELECT 
+        DATE(created_at) as creation_date,
+        COUNT(*) as daily_trips
+      FROM trips
+      GROUP BY DATE(created_at)
+      ORDER BY DATE(created_at) ASC;
+    `);
+
     return {
       categories_breakdown: catRes.rows,
       regional_analytics: regionRes.rows,
-      trip_status_distribution: statusRes.rows
+      trip_status_distribution: statusRes.rows,
+      time_series: timeSeriesRes.rows
     };
   }
 
@@ -94,5 +104,31 @@ export class AdminService {
       ORDER BY u.created_at DESC;
     `);
     return res.rows;
+  }
+
+  static async getUserTrips(userId: string) {
+    const res = await query(`
+      SELECT id, name as title, start_date, end_date, is_public, created_at
+      FROM trips
+      WHERE user_id = $1
+      ORDER BY created_at DESC;
+    `, [userId]);
+    return res.rows;
+  }
+
+  static async toggleUserRole(userId: string) {
+    const res = await query(`
+      UPDATE users 
+      SET is_admin = NOT is_admin 
+      WHERE id = $1 
+      RETURNING id, name, email, is_admin;
+    `, [userId]);
+    return res.rows[0];
+  }
+
+  static async deleteUser(userId: string) {
+    // Relying on ON DELETE CASCADE for foreign keys
+    await query(`DELETE FROM users WHERE id = $1`, [userId]);
+    return true;
   }
 }

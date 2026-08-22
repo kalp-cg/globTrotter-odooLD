@@ -41,10 +41,37 @@ export class AdminController {
 
   static async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await AdminService.getUsers();
-      return sendSuccess(res, data);
-    } catch (err) {
-      next(err);
+      const users = await AdminService.getUsers();
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getUserTrips(req: Request, res: Response, next: NextFunction) {
+    try {
+      const trips = await AdminService.getUserTrips(req.params.id);
+      res.json(trips);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async toggleUserRole(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await AdminService.toggleUserRole(req.params.id);
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      await AdminService.deleteUser(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      next(error);
     }
   }
 }

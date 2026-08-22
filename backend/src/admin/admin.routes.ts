@@ -9,5 +9,8 @@ router.get('/top-cities', requireAdmin, AdminController.getTopCities);
 router.get('/top-activities', requireAdmin, AdminController.getTopActivities);
 router.get('/trends', requireAdmin, AdminController.getTrends);
 router.get('/users', requireAdmin, AdminController.getUsers);
+router.get('/users/:id/trips', requireAdmin, AdminController.getUserTrips);
+router.put('/users/:id/role', requireAdmin, AdminController.toggleUserRole);
+router.delete('/users/:id', requireAdmin, AdminController.deleteUser);
 
 export default router;
