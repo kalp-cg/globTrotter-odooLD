@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { AuthGuard } from "@/components/auth-guard";
 import { Navbar } from "@/components/ui/navbar";
+import { Footer } from "@/components/ui/footer";
 
 // Display/handwritten: headers, stickers, annotations, stamps
 const kalam = Kalam({
@@ -42,6 +43,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           <AuthGuard>{children}</AuthGuard>
+          <Footer />
         </Providers>
       </body>
     </html>
