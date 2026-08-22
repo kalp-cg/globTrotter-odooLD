@@ -85,4 +85,22 @@ export class ItineraryController {
       next(err);
     }
   }
+
+  static async reorderStops(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      if (!req.body.stops || !Array.isArray(req.body.stops)) {
+        return res.status(400).json({ success: false, error: 'stops array is required' });
+      }
+      
+      await ItineraryService.reorderStops(
+        req.params.tripId as string,
+        req.user!.userId,
+        req.user!.isAdmin,
+        req.body.stops
+      );
+      return sendSuccess(res, null, 'Stops reordered successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
 }

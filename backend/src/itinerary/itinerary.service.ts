@@ -184,4 +184,23 @@ export class ItineraryService {
     await BudgetService.recalculateTripBudget(tripId);
     return true;
   }
+
+  static async reorderStops(tripId: string, userId: string, isAdmin: boolean, stops: { id: string; order_index: number }[]) {
+    const tripCheck = await query(`SELECT user_id FROM trips WHERE id = $1`, [tripId]);
+    if (tripCheck.rows.length === 0) throw new AppError('Trip not found', 404);
+    if (tripCheck.rows[0].user_id !== userId && !isAdmin) throw new AppError('Forbidden: Not trip owner', 403);
+
+    // Run within a transaction-like loop for simplicity in this demo, though an actual transaction is better
+    // Neon PG pool query auto-commits, so we'll just update sequentially.
+    for (const stop of stops) {
+      if (!stop.id || stop.order_index === undefined) continue;
+      await query(`
+        UPDATE stops 
+        SET order_index = $1 
+        WHERE id = $2 AND trip_id = $3
+      `, [stop.order_index, stop.id, tripId]);
+    }
+
+    return true;
+  }
 }

@@ -6,6 +6,7 @@ const router = Router({ mergeParams: true });
 
 router.get('/', ItineraryController.getStops);
 router.post('/', requireAuth, ItineraryController.addStop);
+router.put('/reorder', requireAuth, ItineraryController.reorderStops);
 router.put('/:stopId', requireAuth, ItineraryController.updateStop);
 router.delete('/:stopId', requireAuth, ItineraryController.deleteStop);
 router.post('/:stopId/activities', requireAuth, ItineraryController.attachActivity);
